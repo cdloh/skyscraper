@@ -39,13 +39,20 @@ QImage FxFrame::applyEffect(const QImage &src, const Layer &layer, Settings *con
   QImage frame(config->resources[layer.resource]);
   frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-  if(layer.width == -1 && layer.height == -1) {
+  if (layer.width == -1 && layer.height == -1)
+  {
     frame = frame.scaled(src.width(), src.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-  } else if(layer.width == -1 && layer.height != -1) {
+  }
+  else if (layer.width == -1 && layer.height != -1)
+  {
     frame = frame.scaledToHeight(layer.height, Qt::SmoothTransformation);
-  } else if(layer.width != -1 && layer.height == -1) {
+  }
+  else if (layer.width != -1 && layer.height == -1)
+  {
     frame = frame.scaledToWidth(layer.width, Qt::SmoothTransformation);
-  } else if(layer.width != -1 && layer.height != -1) {
+  }
+  else if (layer.width != -1 && layer.height != -1)
+  {
     frame = frame.scaled(layer.width, layer.height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
   }
 

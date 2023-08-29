@@ -42,10 +42,10 @@ class ScraperWorker : public QObject
 
 public:
   ScraperWorker(QSharedPointer<Queue> queue,
-		QSharedPointer<Cache> cache,
-		QSharedPointer<NetManager> manager,
-		Settings config,
-		QString threadId);
+                QSharedPointer<Cache> cache,
+                QSharedPointer<NetManager> manager,
+                Settings config,
+                QString threadId);
   ~ScraperWorker();
   void run();
   bool forceEnd = false;
@@ -66,12 +66,12 @@ private:
   QString platformOrig;
   QString threadId;
 
-  unsigned int editDistance(const std::string& s1, const std::string& s2);
+  unsigned int editDistance(const std::string &s1, const std::string &s2);
 
   GameEntry getBestEntry(const QList<GameEntry> &gameEntries, QString compareTitle,
-			 int &lowestDistance);
+                         int &lowestDistance);
   GameEntry getEntryFromUser(const QList<GameEntry> &gameEntries, const GameEntry &suggestedGame,
-			     const QString &compareTitle, int &lowestDistance);
+                             const QString &compareTitle, int &lowestDistance);
   int getSearchMatch(const QString &title, const QString &compareTitle, const int &lowestDistance);
 
   bool limitReached(QString &output);

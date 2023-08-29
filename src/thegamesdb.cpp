@@ -79,7 +79,7 @@ void TheGamesDb::getSearchResults(QList<GameEntry> &gameEntries,
 
   while(!jsonGames.isEmpty()) {
     QJsonObject jsonGame = jsonGames.first().toObject();
-    
+
     GameEntry game;
     // https://api.thegamesdb.net/v1/Games/ByGameID?id=88&apikey=XXX&fields=game_title,players,release_date,developer,publisher,genres,overview,rating,platform
     game.id = QString::number(jsonGame["id"].toInt());

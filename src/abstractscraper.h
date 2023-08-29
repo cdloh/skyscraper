@@ -42,14 +42,14 @@ class AbstractScraper : public QObject
 
 public:
   AbstractScraper(Settings *config,
-		  QSharedPointer<NetManager> manager);
+                  QSharedPointer<NetManager> manager);
   virtual ~AbstractScraper();
   virtual void getGameData(GameEntry &game);
   virtual QList<QString> getSearchNames(const QFileInfo &info);
   virtual QString getCompareTitle(QFileInfo info);
   virtual void runPasses(QList<GameEntry> &gameEntries, const QFileInfo &info, QString &output, QString &debug);
 
-  //void setConfig(Settings *config);
+  // void setConfig(Settings *config);
 
   int reqRemaining = -1;
 
@@ -57,7 +57,7 @@ protected:
   Settings *config;
 
   virtual void getSearchResults(QList<GameEntry> &gameEntries, QString searchName,
-				QString platform);
+                                QString platform);
   virtual void getDescription(GameEntry &game);
   virtual void getDeveloper(GameEntry &game);
   virtual void getPublisher(GameEntry &game);
@@ -131,7 +131,6 @@ protected:
 
   NetComm *netComm;
   QEventLoop q; // Event loop for use when waiting for data from NetComm.
-
 };
 
 #endif // ABSTRACTSCRAPER_H

@@ -34,18 +34,18 @@ FxGamebox::FxGamebox()
 }
 
 QImage FxGamebox::applyEffect(const QImage &src, const Layer &layer,
-			      const GameEntry &game, Settings *config)
+                              const GameEntry &game, Settings *config)
 {
   QPainter painter;
   QTransform trans;
   double borderFactor = 0.029;
 
   QImage front(src.width() - src.width() * borderFactor, src.height(),
-	       QImage::Format_ARGB32_Premultiplied);
+               QImage::Format_ARGB32_Premultiplied);
   front.fill(Qt::black);
   QImage overlayFront(config->resources["boxfront.png"]);
   overlayFront = overlayFront.scaled(front.width(), front.height(),
-				     Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                                     Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
   painter.begin(&front);
   painter.drawImage(0, front.height() * borderFactor / 2, src.scaledToHeight(front.height() - front.height() * borderFactor));
@@ -60,15 +60,24 @@ QImage FxGamebox::applyEffect(const QImage &src, const Layer &layer,
   fillWithAvg(src, side);
 
   QImage sideImage;
-  if(layer.resource == "cover") {
+  if (layer.resource == "cover")
+  {
     sideImage = QImage::fromData(game.coverData);
-  } else if(layer.resource == "screenshot") {
+  }
+  else if (layer.resource == "screenshot")
+  {
     sideImage = QImage::fromData(game.screenshotData);
-  } else if(layer.resource == "wheel") {
+  }
+  else if (layer.resource == "wheel")
+  {
     sideImage = QImage::fromData(game.wheelData);
-  } else if(layer.resource == "marquee") {
+  }
+  else if (layer.resource == "marquee")
+  {
     sideImage = QImage::fromData(game.marqueeData);
-  } else {
+  }
+  else
+  {
     sideImage = QImage(config->resources[layer.resource]);
   }
   sideImage = sideImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
@@ -77,44 +86,55 @@ QImage FxGamebox::applyEffect(const QImage &src, const Layer &layer,
   trans.rotate(layer.delta, Qt::ZAxis);
   sideImage = sideImage.transformed(trans, Qt::SmoothTransformation);
   // Scale spine / side artwork
-  if(layer.scaling == "") {
+  if (layer.scaling == "")
+  {
     // Autoscale
-    if((double)sideImage.height() / sideImage.width() > (double)side.height() / side.width()) {
+    if ((double)sideImage.height() / sideImage.width() > (double)side.height() / side.width())
+    {
       sideImage = sideImage.scaledToHeight(side.height() - side.height() * borderFactor, Qt::SmoothTransformation);
-    } else {
+    }
+    else
+    {
       sideImage = sideImage.scaledToWidth(side.width(), Qt::SmoothTransformation);
     }
-  } else {
+  }
+  else
+  {
     // Scale per 'sidescale' attribute
-    if(layer.scaling == "height") {
+    if (layer.scaling == "height")
+    {
       sideImage = sideImage.scaledToHeight(side.height() - side.height() * borderFactor, Qt::SmoothTransformation);
-    } else if(layer.scaling == "width") {
+    }
+    else if (layer.scaling == "width")
+    {
       sideImage = sideImage.scaledToWidth(side.width(), Qt::SmoothTransformation);
-    } else if(layer.scaling == "both") {
+    }
+    else if (layer.scaling == "both")
+    {
       sideImage = sideImage.scaled(side.width(), side.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
   }
 
   painter.begin(&side);
   painter.drawImage(side.width() / 2.0 - sideImage.width() / 2.0,
-		    side.height() / 2.0 - sideImage.height() / 2.0, sideImage);
+                    side.height() / 2.0 - sideImage.height() / 2.0, sideImage);
   painter.drawImage(0, 0, overlaySide);
   painter.end();
 
   // At this point both side and front are done and ready to be rotated in 3D
   trans.reset();
   trans.rotate(-30, Qt::YAxis);
-  trans.translate(0, - front.height() / 2.0);
+  trans.translate(0, -front.height() / 2.0);
   front = front.transformed(trans, Qt::SmoothTransformation);
 
   trans.reset();
   trans.rotate(60, Qt::YAxis);
-  trans.translate(0, - side.height() / 2.0);
+  trans.translate(0, -side.height() / 2.0);
   side = side.transformed(trans, Qt::SmoothTransformation);
   side = side.scaledToHeight(front.height(), Qt::SmoothTransformation);
 
   QImage gamebox(side.width() + front.width(), front.height(),
-		 QImage::Format_ARGB32_Premultiplied);
+                 QImage::Format_ARGB32_Premultiplied);
   gamebox.fill(Qt::transparent);
   painter.begin(&gamebox);
   painter.drawImage(0, 0, side);
@@ -130,12 +150,14 @@ void FxGamebox::fillWithAvg(const QImage &src, QImage &dst)
   int avgBlue = 0;
   int x = (double)src.width() / 100.0 * 3.0;
 
-  if(src.height() > 20 && src.width() > x) {
+  if (src.height() > 20 && src.width() > x)
+  {
     double segDelta = (double)src.height() / 200.0;
     double segs = 20.0;
-    
+
     int samples = 0;
-    for(double y = 0.0; y < segDelta * segs; y += segDelta) {
+    for (double y = 0.0; y < segDelta * segs; y += segDelta)
+    {
       QRgb *scanline = (QRgb *)src.constScanLine((int)y);
       avgRed += qRed(scanline[x]);
       avgGreen += qGreen(scanline[x]);

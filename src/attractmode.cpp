@@ -36,33 +36,37 @@ AttractMode::AttractMode()
 bool AttractMode::loadOldGameList(const QString &gameListFileString)
 {
   QFile gameListFile(gameListFileString);
-  if(gameListFile.open(QIODevice::ReadOnly)) {
-    while(!gameListFile.atEnd()) {
+  if (gameListFile.open(QIODevice::ReadOnly))
+  {
+    while (!gameListFile.atEnd())
+    {
       QList<QByteArray> snippets = gameListFile.readLine().split(';');
-      if(snippets.length() >= 17) {
-	if(snippets.at(0) == "#Name") {
-	  continue;
-	}
-	GameEntry entry;
-	entry.baseName = snippets.at(0);
-	// Do NOT get sqr and par notes here. They are not used by skipExisting
-	entry.title = snippets.at(1);
-	//entry.aMEmulator = snippets.at(2);
-	entry.aMCloneOf = snippets.at(3);
-	entry.releaseDate = snippets.at(4) + "0101";
-	entry.publisher = snippets.at(5);
-	entry.tags = snippets.at(6);
-	entry.players = snippets.at(7);
-	entry.aMRotation = snippets.at(8);
-	entry.aMControl = snippets.at(9);
-	entry.aMStatus = snippets.at(10);
-	entry.aMDisplayCount = snippets.at(11);
-	entry.aMDisplayType = snippets.at(12);
-	entry.aMAltRomName = snippets.at(13);
-	entry.aMAltTitle = snippets.at(14);
-	entry.aMExtra = snippets.at(15);
-	entry.aMButtons = snippets.at(16);
-	oldEntries.append(entry);
+      if (snippets.length() >= 17)
+      {
+        if (snippets.at(0) == "#Name")
+        {
+          continue;
+        }
+        GameEntry entry;
+        entry.baseName = snippets.at(0);
+        // Do NOT get sqr and par notes here. They are not used by skipExisting
+        entry.title = snippets.at(1);
+        // entry.aMEmulator = snippets.at(2);
+        entry.aMCloneOf = snippets.at(3);
+        entry.releaseDate = snippets.at(4) + "0101";
+        entry.publisher = snippets.at(5);
+        entry.tags = snippets.at(6);
+        entry.players = snippets.at(7);
+        entry.aMRotation = snippets.at(8);
+        entry.aMControl = snippets.at(9);
+        entry.aMStatus = snippets.at(10);
+        entry.aMDisplayCount = snippets.at(11);
+        entry.aMDisplayType = snippets.at(12);
+        entry.aMAltRomName = snippets.at(13);
+        entry.aMAltTitle = snippets.at(14);
+        entry.aMExtra = snippets.at(15);
+        entry.aMButtons = snippets.at(16);
+        oldEntries.append(entry);
       }
     }
     gameListFile.close();
@@ -78,17 +82,21 @@ bool AttractMode::skipExisting(QList<GameEntry> &gameEntries, QSharedPointer<Que
 
   printf("Resolving missing entries...");
   int dots = 0;
-  for(int a = 0; a < gameEntries.length(); ++a) {
+  for (int a = 0; a < gameEntries.length(); ++a)
+  {
     dots++;
-    if(dots % 100 == 0) {
+    if (dots % 100 == 0)
+    {
       printf(".");
       fflush(stdout);
     }
-    for(int b = 0; b < queue->length(); ++b) {
-      if(gameEntries.at(a).baseName == queue->at(b).completeBaseName()) {
-	queue->removeAt(b);
-	// We assume baseName is unique, so break after getting first hit
-	break;
+    for (int b = 0; b < queue->length(); ++b)
+    {
+      if (gameEntries.at(a).baseName == queue->at(b).completeBaseName())
+      {
+        queue->removeAt(b);
+        // We assume baseName is unique, so break after getting first hit
+        break;
       }
     }
   }
@@ -98,42 +106,44 @@ bool AttractMode::skipExisting(QList<GameEntry> &gameEntries, QSharedPointer<Que
 
 void AttractMode::preserveFromOld(GameEntry &entry)
 {
-  for(const auto &oldEntry: oldEntries) {
-    if(oldEntry.baseName == entry.baseName) {
-      if(entry.developer.isEmpty())
-	entry.developer = oldEntry.developer;
-      if(entry.publisher.isEmpty())
-	entry.publisher = oldEntry.publisher;
-      if(entry.players.isEmpty())
-	entry.players = oldEntry.players;
-      if(entry.description.isEmpty())
-	entry.description = oldEntry.description;
-      if(entry.rating.isEmpty())
-	entry.rating = oldEntry.rating;
-      if(entry.releaseDate.isEmpty())
-	entry.releaseDate = oldEntry.releaseDate;
-      if(entry.tags.isEmpty())
-	entry.tags = oldEntry.tags;
-      if(entry.aMCloneOf.isEmpty())
-	entry.aMCloneOf = oldEntry.aMCloneOf;
-      if(entry.aMRotation.isEmpty())
-	entry.aMRotation = oldEntry.aMRotation;
-      if(entry.aMControl.isEmpty())
-	entry.aMControl = oldEntry.aMControl;
-      if(entry.aMStatus.isEmpty())
-	entry.aMStatus = oldEntry.aMStatus;
-      if(entry.aMDisplayCount.isEmpty())
-	entry.aMDisplayCount = oldEntry.aMDisplayCount;
-      if(entry.aMDisplayType.isEmpty())
-	entry.aMDisplayType = oldEntry.aMDisplayType;
-      if(entry.aMAltRomName.isEmpty())
-	entry.aMAltRomName = oldEntry.aMAltRomName;
-      if(entry.aMAltTitle.isEmpty())
-	entry.aMAltTitle = oldEntry.aMAltTitle;
-      if(entry.aMExtra.isEmpty())
-	entry.aMExtra = oldEntry.aMExtra;
-      if(entry.aMButtons.isEmpty())
-	entry.aMButtons = oldEntry.aMButtons;
+  for (const auto &oldEntry : oldEntries)
+  {
+    if (oldEntry.baseName == entry.baseName)
+    {
+      if (entry.developer.isEmpty())
+        entry.developer = oldEntry.developer;
+      if (entry.publisher.isEmpty())
+        entry.publisher = oldEntry.publisher;
+      if (entry.players.isEmpty())
+        entry.players = oldEntry.players;
+      if (entry.description.isEmpty())
+        entry.description = oldEntry.description;
+      if (entry.rating.isEmpty())
+        entry.rating = oldEntry.rating;
+      if (entry.releaseDate.isEmpty())
+        entry.releaseDate = oldEntry.releaseDate;
+      if (entry.tags.isEmpty())
+        entry.tags = oldEntry.tags;
+      if (entry.aMCloneOf.isEmpty())
+        entry.aMCloneOf = oldEntry.aMCloneOf;
+      if (entry.aMRotation.isEmpty())
+        entry.aMRotation = oldEntry.aMRotation;
+      if (entry.aMControl.isEmpty())
+        entry.aMControl = oldEntry.aMControl;
+      if (entry.aMStatus.isEmpty())
+        entry.aMStatus = oldEntry.aMStatus;
+      if (entry.aMDisplayCount.isEmpty())
+        entry.aMDisplayCount = oldEntry.aMDisplayCount;
+      if (entry.aMDisplayType.isEmpty())
+        entry.aMDisplayType = oldEntry.aMDisplayType;
+      if (entry.aMAltRomName.isEmpty())
+        entry.aMAltRomName = oldEntry.aMAltRomName;
+      if (entry.aMAltTitle.isEmpty())
+        entry.aMAltTitle = oldEntry.aMAltTitle;
+      if (entry.aMExtra.isEmpty())
+        entry.aMExtra = oldEntry.aMExtra;
+      if (entry.aMButtons.isEmpty())
+        entry.aMButtons = oldEntry.aMButtons;
       break;
     }
   }
@@ -146,8 +156,10 @@ void AttractMode::assembleList(QString &finalOutput, QList<GameEntry> &gameEntri
   int dotMod = gameEntries.length() * 0.1 + 1;
 
   finalOutput.append("#Name;Title;Emulator;CloneOf;Year;Manufacturer;Category;Players;Rotation;Control;Status;DisplayCount;DisplayType;AltRomname;AltTitle;Extra;Buttons;Series;Language;Region;Rating\n");
-  for(auto &entry: gameEntries) {
-    if(dots % dotMod == 0) {
+  for (auto &entry : gameEntries)
+  {
+    if (dots % dotMod == 0)
+    {
       printf(".");
       fflush(stdout);
     }
@@ -156,28 +168,30 @@ void AttractMode::assembleList(QString &finalOutput, QList<GameEntry> &gameEntri
     preserveFromOld(entry);
 
     finalOutput.append(entry.baseName + ";" +
-		       entry.title);
-    finalOutput.append(";" +		       
-		       emuInfo.completeBaseName() + ";" +
-		       entry.aMCloneOf + ";" +
-		       QDate::fromString(entry.releaseDate, "yyyyMMdd").toString("yyyy") + ";" +
-		       entry.publisher + ";" +
-		       entry.tags + ";" +
-		       entry.players + ";" +
-		       entry.aMRotation + ";" +
-		       entry.aMControl + ";" +
-		       entry.aMStatus + ";" +
-		       entry.aMDisplayCount + ";" +
-		       entry.aMDisplayType + ";" +
-		       entry.aMAltRomName + ";" +
-		       entry.aMAltTitle + ";" +
-		       entry.aMExtra + ";" +
-		       entry.aMButtons + ";;;;" + entry.rating + "\n");
-    if(!entry.description.isEmpty() && saveDescFile) {
+                       entry.title);
+    finalOutput.append(";" +
+                       emuInfo.completeBaseName() + ";" +
+                       entry.aMCloneOf + ";" +
+                       QDate::fromString(entry.releaseDate, "yyyyMMdd").toString("yyyy") + ";" +
+                       entry.publisher + ";" +
+                       entry.tags + ";" +
+                       entry.players + ";" +
+                       entry.aMRotation + ";" +
+                       entry.aMControl + ";" +
+                       entry.aMStatus + ";" +
+                       entry.aMDisplayCount + ";" +
+                       entry.aMDisplayType + ";" +
+                       entry.aMAltRomName + ";" +
+                       entry.aMAltTitle + ";" +
+                       entry.aMExtra + ";" +
+                       entry.aMButtons + ";;;;" + entry.rating + "\n");
+    if (!entry.description.isEmpty() && saveDescFile)
+    {
       QFile descFile(descDir.absolutePath() + "/" + entry.baseName + ".txt");
-      if(descFile.open(QIODevice::WriteOnly)) {
-	descFile.write(entry.description.trimmed().toUtf8().left(config->maxLength));
-	descFile.close();
+      if (descFile.open(QIODevice::WriteOnly))
+      {
+        descFile.write(entry.description.trimmed().toUtf8().left(config->maxLength));
+        descFile.close();
       }
     }
   }
@@ -185,34 +199,41 @@ void AttractMode::assembleList(QString &finalOutput, QList<GameEntry> &gameEntri
 
 void AttractMode::checkReqs()
 {
-  if(config->frontendExtra.isEmpty()) {
+  if (config->frontendExtra.isEmpty())
+  {
     printf("Frontend 'attractmode' requires emulator set with '-e'. Check '--help' for more information.\n");
     exit(0);
   }
-  if(!config->frontendExtra.contains(".cfg")) {
+  if (!config->frontendExtra.contains(".cfg"))
+  {
     config->frontendExtra.append(".cfg");
   }
 
-
   emuInfo.setFile(config->frontendExtra);
   descDir.setPath(QDir::homePath() + "/.attract/scraper/" +
-		  emuInfo.completeBaseName() + "/overview");
-  if(descDir.exists()) {
+                  emuInfo.completeBaseName() + "/overview");
+  if (descDir.exists())
+  {
     saveDescFile = true;
-  } else {
-    if(descDir.mkpath(descDir.absolutePath())) {
+  }
+  else
+  {
+    if (descDir.mkpath(descDir.absolutePath()))
+    {
       saveDescFile = true;
     }
   }
 
   printf("Looking for emulator cfg file:\n");
 
-  if(checkEmulatorFile(config->frontendExtra)) {
+  if (checkEmulatorFile(config->frontendExtra))
+  {
     return;
   }
 
   // For RetroPie this is linked directly to /opt/retropie/configs/all/attractmode/emulators/
-  if(checkEmulatorFile(QDir::homePath() + "/.attract/emulators/" + config->frontendExtra)) {
+  if (checkEmulatorFile(QDir::homePath() + "/.attract/emulators/" + config->frontendExtra))
+  {
     return;
   }
 
@@ -225,11 +246,14 @@ bool AttractMode::checkEmulatorFile(QString fileName)
   QFileInfo info(fileName);
   printf("Trying '%s'... ", info.absoluteFilePath().toStdString().c_str());
 
-  if(info.exists() && info.isFile()) {
+  if (info.exists() && info.isFile())
+  {
     config->frontendExtra = info.absoluteFilePath();
     printf("\033[1;32mFound!\033[0m\n\n");
     return true;
-  } else {
+  }
+  else
+  {
     printf("Not found!\n");
     return false;
   }
@@ -254,7 +278,8 @@ QString AttractMode::getInputFolder()
 QString AttractMode::getGameListFolder()
 {
   // For RetroPie this is linked directly to /opt/retropie/configs/all/attractmode/romlists/
-  if(QFileInfo::exists(QDir::homePath() + "/.attract/romlists")) {
+  if (QFileInfo::exists(QDir::homePath() + "/.attract/romlists"))
+  {
     return QString(QDir::homePath() + "/.attract/romlists");
   }
 
@@ -265,8 +290,9 @@ QString AttractMode::getCoversFolder()
 {
   QString type = "flyer";
   QString mediaTypeFolder = getMediaTypeFolder(type);
-  if(mediaTypeFolder.isEmpty()) {
-    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/"?"":"/") + type;
+  if (mediaTypeFolder.isEmpty())
+  {
+    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/" ? "" : "/") + type;
   }
   return mediaTypeFolder;
 }
@@ -275,8 +301,9 @@ QString AttractMode::getScreenshotsFolder()
 {
   QString type = "snap";
   QString mediaTypeFolder = getMediaTypeFolder(type);
-  if(mediaTypeFolder.isEmpty()) {
-    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/"?"":"/") + type;
+  if (mediaTypeFolder.isEmpty())
+  {
+    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/" ? "" : "/") + type;
   }
   return mediaTypeFolder;
 }
@@ -285,8 +312,9 @@ QString AttractMode::getWheelsFolder()
 {
   QString type = "wheel";
   QString mediaTypeFolder = getMediaTypeFolder(type);
-  if(mediaTypeFolder.isEmpty()) {
-    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/"?"":"/") + type;
+  if (mediaTypeFolder.isEmpty())
+  {
+    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/" ? "" : "/") + type;
   }
   return mediaTypeFolder;
 }
@@ -295,8 +323,9 @@ QString AttractMode::getMarqueesFolder()
 {
   QString type = "marquee";
   QString mediaTypeFolder = getMediaTypeFolder(type);
-  if(mediaTypeFolder.isEmpty()) {
-    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/"?"":"/") + type;
+  if (mediaTypeFolder.isEmpty())
+  {
+    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/" ? "" : "/") + type;
   }
   return mediaTypeFolder;
 }
@@ -305,8 +334,9 @@ QString AttractMode::getTexturesFolder()
 {
   QString type = "texture";
   QString mediaTypeFolder = getMediaTypeFolder(type);
-  if(mediaTypeFolder.isEmpty()) {
-    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/"?"":"/") + type;
+  if (mediaTypeFolder.isEmpty())
+  {
+    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/" ? "" : "/") + type;
   }
   return mediaTypeFolder;
 }
@@ -315,11 +345,13 @@ QString AttractMode::getVideosFolder()
 {
   QString type = "video";
   QString mediaTypeFolder = getMediaTypeFolder(type);
-  if(mediaTypeFolder.isEmpty()) {
+  if (mediaTypeFolder.isEmpty())
+  {
     mediaTypeFolder = getMediaTypeFolder("snap", true);
   }
-  if(mediaTypeFolder.isEmpty()) {
-    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/"?"":"/") + type;
+  if (mediaTypeFolder.isEmpty())
+  {
+    mediaTypeFolder = config->mediaFolder + (config->mediaFolder.right(1) == "/" ? "" : "/") + type;
   }
   return mediaTypeFolder;
 }
@@ -329,33 +361,42 @@ QString AttractMode::getMediaTypeFolder(QString type, bool detectVideoPath)
   QString mediaTypeFolder = "";
   QFile emulatorFile(config->frontendExtra);
 
-  if(emulatorFile.exists() && emulatorFile.open(QIODevice::ReadOnly)) {
-    while(!emulatorFile.atEnd()) {
+  if (emulatorFile.exists() && emulatorFile.open(QIODevice::ReadOnly))
+  {
+    while (!emulatorFile.atEnd())
+    {
       QByteArray line = emulatorFile.readLine();
       line = line.trimmed();
       line.replace("~", QDir::homePath().toUtf8());
       line.replace("$HOME", QDir::homePath().toUtf8());
       QString lookFor = "artwork";
-      if(line.left(lookFor.length()) == lookFor) {
-	line = line.remove(0, lookFor.length()).trimmed();
-	if(line.left(type.length()) == type) {
-	  line = line.remove(0, type.length()).trimmed();
-	  QList<QByteArray> paths = line.split(';');
-	  // This is some weird case where the 'snap' artwork line can contain multiple paths
-	  // and one of those paths is actually the video path. It was reported in an issue
-	  // and this is seemlingly how it should work for those cases where the user does not
-	  // use an 'artwork video' line.
-	  if(detectVideoPath) {
-	    for(const auto &path: paths) {
-	      if(path.contains("video")) {
-		mediaTypeFolder = path;
-		break;
-	      }
-	    }
-	  } else {
-	    mediaTypeFolder = paths.first();
-	  }
-	}
+      if (line.left(lookFor.length()) == lookFor)
+      {
+        line = line.remove(0, lookFor.length()).trimmed();
+        if (line.left(type.length()) == type)
+        {
+          line = line.remove(0, type.length()).trimmed();
+          QList<QByteArray> paths = line.split(';');
+          // This is some weird case where the 'snap' artwork line can contain multiple paths
+          // and one of those paths is actually the video path. It was reported in an issue
+          // and this is seemlingly how it should work for those cases where the user does not
+          // use an 'artwork video' line.
+          if (detectVideoPath)
+          {
+            for (const auto &path : paths)
+            {
+              if (path.contains("video"))
+              {
+                mediaTypeFolder = path;
+                break;
+              }
+            }
+          }
+          else
+          {
+            mediaTypeFolder = paths.first();
+          }
+        }
       }
     }
     emulatorFile.close();

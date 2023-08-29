@@ -38,12 +38,14 @@ QImage FxSaturation::applyEffect(const QImage &src, const Layer &layer)
 
   int saturation = layer.delta;
 
-  for(int y = 0; y < canvas.height(); ++y) {
-    QRgb* line = (QRgb *)canvas.scanLine(y);
-    for(int x = 0; x < canvas.width(); ++x) {
+  for (int y = 0; y < canvas.height(); ++y)
+  {
+    QRgb *line = (QRgb *)canvas.scanLine(y);
+    for (int x = 0; x < canvas.width(); ++x)
+    {
       QColor color(line[x]);
       color.setHsl(color.hue(), truncate(color.hslSaturation() + saturation), color.lightness(),
-		   qAlpha(line[x]));
+                   qAlpha(line[x]));
       line[x] = qPremultiply(color.rgba());
     }
   }
@@ -53,10 +55,12 @@ QImage FxSaturation::applyEffect(const QImage &src, const Layer &layer)
 
 int FxSaturation::truncate(int value)
 {
-  if(value > 255) {
+  if (value > 255)
+  {
     value = 255;
   }
-  if(value < 0) {
+  if (value < 0)
+  {
     value = 0;
   }
   return value;

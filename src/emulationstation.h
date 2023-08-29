@@ -48,7 +48,6 @@ public:
   QString getMarqueesFolder() override;
   QString getTexturesFolder() override;
   QString getVideosFolder() override;
-
 };
 
 #endif // EMULATIONSTATION_H

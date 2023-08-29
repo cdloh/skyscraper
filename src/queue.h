@@ -43,7 +43,6 @@ public:
 private:
   QMutex queueMutex;
   QList<QString> getRegExpPatterns(QString patterns);
-
 };
 
 #endif // QUEUE_H

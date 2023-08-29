@@ -38,7 +38,6 @@ class FxScanlines : public QObject
 public:
   FxScanlines();
   QImage applyEffect(const QImage &src, const Layer &layer, Settings *config);
-
 };
 
 #endif // FXSCANLINES_H

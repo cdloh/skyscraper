@@ -34,22 +34,22 @@ class Platform : public QObject
 {
   Q_OBJECT
 public:
-    static Platform& get();
+  static Platform &get();
 
-    void loadConfig(const QString& configPath);
-    void clearConfigData();
+  void loadConfig(const QString &configPath);
+  void clearConfigData();
 
-    QStringList getPlatforms() const;
-    QStringList getScrapers(QString platform) const;
-    QString getFormats(QString platform, QString extensions, QString addExtensions) const;
-    QString getDefaultScraper() const;
-    QStringList getAliases(QString platform) const;
+  QStringList getPlatforms() const;
+  QStringList getScrapers(QString platform) const;
+  QString getFormats(QString platform, QString extensions, QString addExtensions) const;
+  QString getDefaultScraper() const;
+  QStringList getAliases(QString platform) const;
 
 private:
-    QStringList platforms;
-    QMap<QString, QStringList> platformToScrapers;
-    QMap<QString, QStringList> platformToFormats;
-    QMap<QString, QStringList> platformToAliases;
+  QStringList platforms;
+  QMap<QString, QStringList> platformToScrapers;
+  QMap<QString, QStringList> platformToFormats;
+  QMap<QString, QStringList> platformToAliases;
 };
 
 #endif // PLATFORM_H

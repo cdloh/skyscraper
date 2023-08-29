@@ -41,7 +41,7 @@ public:
 private:
   QList<QString> getSearchNames(const QFileInfo &info) override;
   void getSearchResults(QList<GameEntry> &gameEntries,
-			QString searchName, QString platform) override;
+                        QString searchName, QString platform) override;
   void getGameData(GameEntry &game) override;
   void getReleaseDate(GameEntry &game) override;
   void getPlayers(GameEntry &game) override;
@@ -56,7 +56,6 @@ private:
 
   QJsonDocument jsonDoc;
   QJsonObject jsonObj;
-
 };
 
 #endif // ARCADEDB_H

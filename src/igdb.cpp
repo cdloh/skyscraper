@@ -30,8 +30,8 @@
 #include "nametools.h"
 
 Igdb::Igdb(Settings *config,
-	   QSharedPointer<NetManager> manager)
-  : AbstractScraper(config, manager)
+           QSharedPointer<NetManager> manager)
+    : AbstractScraper(config, manager)
 {
   QPair<QString, QString> clientIdHeader;
   clientIdHeader.first = "Client-ID";
@@ -43,7 +43,7 @@ Igdb::Igdb(Settings *config,
 
   headers.append(clientIdHeader);
   headers.append(tokenHeader);
-  
+
   connect(&limitTimer, &QTimer::timeout, &limiter, &QEventLoop::quit);
   limitTimer.setInterval(1100); // 1.1 second request limit set a bit above 1.0 as requested by the good folks at IGDB. Don't change! It will break the module stability.
   limitTimer.setSingleShot(false);
@@ -64,20 +64,22 @@ Igdb::Igdb(Settings *config,
 }
 
 void Igdb::getSearchResults(QList<GameEntry> &gameEntries,
-				QString searchName, QString platform)
+                            QString searchName, QString platform)
 {
   // Request list of games but don't allow re-releases ("game.version_parent = null")
   limiter.exec();
   netComm->request(baseUrl + "/search/", "fields game.name,game.platforms.name; search \"" + searchName + "\"; where game != null & game.version_parent = null;", headers);
   q.exec();
   data = netComm->getData();
-  
+
   jsonDoc = QJsonDocument::fromJson(data);
-  if(jsonDoc.isEmpty()) {
+  if (jsonDoc.isEmpty())
+  {
     return;
   }
 
-  if(jsonDoc.object()["message"].toString() == "Too Many Requests") { 
+  if (jsonDoc.object()["message"].toString() == "Too Many Requests")
+  {
     printf("\033[1;31mThe IGDB requests per second limit has been exceeded, can't continue!\033[0m\n");
     reqRemaining = 0;
     return;
@@ -85,18 +87,21 @@ void Igdb::getSearchResults(QList<GameEntry> &gameEntries,
 
   QJsonArray jsonGames = jsonDoc.array();
 
-  for(const auto &jsonGame: jsonGames) {
+  for (const auto &jsonGame : jsonGames)
+  {
     GameEntry game;
-    
+
     game.title = jsonGame.toObject()["game"].toObject()["name"].toString();
     game.id = QString::number(jsonGame.toObject()["game"].toObject()["id"].toInt());
 
     QJsonArray jsonPlatforms = jsonGame.toObject()["game"].toObject()["platforms"].toArray();
-    for(const auto &jsonPlatform: jsonPlatforms) {
+    for (const auto &jsonPlatform : jsonPlatforms)
+    {
       game.id.append(";" + QString::number(jsonPlatform.toObject()["id"].toInt()));
       game.platform = jsonPlatform.toObject()["name"].toString();
-      if(platformMatch(game.platform, platform)) {
-	gameEntries.append(game);
+      if (platformMatch(game.platform, platform))
+      {
+        gameEntries.append(game);
       }
     }
   }
@@ -110,14 +115,17 @@ void Igdb::getGameData(GameEntry &game)
   data = netComm->getData();
 
   jsonDoc = QJsonDocument::fromJson(data);
-  if(jsonDoc.isEmpty()) {
+  if (jsonDoc.isEmpty())
+  {
     return;
   }
 
   jsonObj = jsonDoc.array().first().toObject();
 
-  for(int a = 0; a < fetchOrder.length(); ++a) {
-    switch(fetchOrder.at(a)) {
+  for (int a = 0; a < fetchOrder.length(); ++a)
+  {
+    switch (fetchOrder.at(a))
+    {
     case DESCRIPTION:
       getDescription(game);
       break;
@@ -143,17 +151,18 @@ void Igdb::getGameData(GameEntry &game)
       getReleaseDate(game);
       break;
     case COVER:
-      if(config->cacheCovers) {
-	getCover(game);
+      if (config->cacheCovers)
+      {
+        getCover(game);
       }
       break;
     case SCREENSHOT:
-      if(config->cacheScreenshots) {
-	getScreenshot(game);
+      if (config->cacheScreenshots)
+      {
+        getScreenshot(game);
       }
       break;
-    default:
-      ;
+    default:;
     }
   }
 }
@@ -162,35 +171,38 @@ void Igdb::getReleaseDate(GameEntry &game)
 {
   QJsonArray jsonDates = jsonObj["release_dates"].toArray();
   bool regionMatch = false;
-  for(const auto &region: regionPrios) {
-    for(const auto &jsonDate: jsonDates) {
+  for (const auto &region : regionPrios)
+  {
+    for (const auto &jsonDate : jsonDates)
+    {
       int regionEnum = jsonDate.toObject()["region"].toInt();
       QString curRegion = "";
-      if(regionEnum == 1)
-	curRegion = "eu";
-      else if(regionEnum == 2)
-	curRegion = "us";
-      else if(regionEnum == 3)
-	curRegion = "au";
-      else if(regionEnum == 4)
-	curRegion = "nz";
-      else if(regionEnum == 5)
-	curRegion = "jp";
-      else if(regionEnum == 6)
-	curRegion = "cn";
-      else if(regionEnum == 7)
-	curRegion = "asi";
-      else if(regionEnum == 8)
-	curRegion = "wor";
-      if(QString::number(jsonDate.toObject()["platform"].toInt()) ==
-	 game.id.split(";").last() &&
-	 region == curRegion) {
-	game.releaseDate = QDateTime::fromMSecsSinceEpoch((qint64)jsonDate.toObject()["date"].toInt() * 1000).toString("yyyyMMdd");
-	regionMatch = true;
-	break;
+      if (regionEnum == 1)
+        curRegion = "eu";
+      else if (regionEnum == 2)
+        curRegion = "us";
+      else if (regionEnum == 3)
+        curRegion = "au";
+      else if (regionEnum == 4)
+        curRegion = "nz";
+      else if (regionEnum == 5)
+        curRegion = "jp";
+      else if (regionEnum == 6)
+        curRegion = "cn";
+      else if (regionEnum == 7)
+        curRegion = "asi";
+      else if (regionEnum == 8)
+        curRegion = "wor";
+      if (QString::number(jsonDate.toObject()["platform"].toInt()) ==
+              game.id.split(";").last() &&
+          region == curRegion)
+      {
+        game.releaseDate = QDateTime::fromMSecsSinceEpoch((qint64)jsonDate.toObject()["date"].toInt() * 1000).toString("yyyyMMdd");
+        regionMatch = true;
+        break;
       }
     }
-    if(regionMatch)
+    if (regionMatch)
       break;
   }
 }
@@ -206,8 +218,10 @@ void Igdb::getPlayers(GameEntry &game)
   // So basically if != 1 it's at least 2 players. That's all we can gather from this
   game.players = "1";
   QJsonArray jsonPlayers = jsonObj["game_modes"].toArray();
-  for(const auto &jsonPlayer: jsonPlayers) {
-    if(jsonPlayer.toObject()["id"].toInt() != 1) {
+  for (const auto &jsonPlayer : jsonPlayers)
+  {
+    if (jsonPlayer.toObject()["id"].toInt() != 1)
+    {
       game.players = "2";
       break;
     }
@@ -217,7 +231,8 @@ void Igdb::getPlayers(GameEntry &game)
 void Igdb::getTags(GameEntry &game)
 {
   QJsonArray jsonGenres = jsonObj["genres"].toArray();
-  for(const auto &jsonGenre: jsonGenres) {
+  for (const auto &jsonGenre : jsonGenres)
+  {
     game.tags.append(jsonGenre.toObject()["name"].toString() + ", ");
   }
   game.tags = game.tags.left(game.tags.length() - 2);
@@ -226,29 +241,52 @@ void Igdb::getTags(GameEntry &game)
 void Igdb::getAges(GameEntry &game)
 {
   int agesEnum = jsonObj["age_ratings"].toArray().first().toObject()["rating"].toInt();
-  if(agesEnum == 1) {
+  if (agesEnum == 1)
+  {
     game.ages = "3";
-  } else if(agesEnum == 2) {
+  }
+  else if (agesEnum == 2)
+  {
     game.ages = "7";
-  } else if(agesEnum == 3) {
+  }
+  else if (agesEnum == 3)
+  {
     game.ages = "12";
-  } else if(agesEnum == 4) {
+  }
+  else if (agesEnum == 4)
+  {
     game.ages = "16";
-  } else if(agesEnum == 5) {
+  }
+  else if (agesEnum == 5)
+  {
     game.ages = "18";
-  } else if(agesEnum == 6) {
+  }
+  else if (agesEnum == 6)
+  {
     // Rating pending
-  } else if(agesEnum == 7) {
+  }
+  else if (agesEnum == 7)
+  {
     game.ages = "EC";
-  } else if(agesEnum == 8) {
+  }
+  else if (agesEnum == 8)
+  {
     game.ages = "E";
-  } else if(agesEnum == 9) {
+  }
+  else if (agesEnum == 9)
+  {
     game.ages = "E10";
-  } else if(agesEnum == 10) {
+  }
+  else if (agesEnum == 10)
+  {
     game.ages = "T";
-  } else if(agesEnum == 11) {
+  }
+  else if (agesEnum == 11)
+  {
     game.ages = "M";
-  } else if(agesEnum == 12) {
+  }
+  else if (agesEnum == 12)
+  {
     game.ages = "AO";
   }
 }
@@ -256,29 +294,34 @@ void Igdb::getAges(GameEntry &game)
 void Igdb::getPublisher(GameEntry &game)
 {
   QJsonArray jsonCompanies = jsonObj["involved_companies"].toArray();
-  for(const auto &jsonCompany: jsonCompanies) {
-    if(jsonCompany.toObject()["publisher"].toBool() == true) {
+  for (const auto &jsonCompany : jsonCompanies)
+  {
+    if (jsonCompany.toObject()["publisher"].toBool() == true)
+    {
       game.publisher = jsonCompany.toObject()["company"].toObject()["name"].toString();
       return;
     }
-  }  
+  }
 }
 
 void Igdb::getDeveloper(GameEntry &game)
 {
   QJsonArray jsonCompanies = jsonObj["involved_companies"].toArray();
-  for(const auto &jsonCompany: jsonCompanies) {
-    if(jsonCompany.toObject()["developer"].toBool() == true) {
+  for (const auto &jsonCompany : jsonCompanies)
+  {
+    if (jsonCompany.toObject()["developer"].toBool() == true)
+    {
       game.developer = jsonCompany.toObject()["company"].toObject()["name"].toString();
       return;
     }
-  }  
+  }
 }
 
 void Igdb::getDescription(GameEntry &game)
 {
   QJsonValue jsonValue = jsonObj["summary"];
-  if(jsonValue != QJsonValue::Undefined) {
+  if (jsonValue != QJsonValue::Undefined)
+  {
     game.description = StrTools::stripHtmlTags(jsonValue.toString());
   }
 }
@@ -286,9 +329,11 @@ void Igdb::getDescription(GameEntry &game)
 void Igdb::getRating(GameEntry &game)
 {
   QJsonValue jsonValue = jsonObj["total_rating"];
-  if(jsonValue != QJsonValue::Undefined) {
+  if (jsonValue != QJsonValue::Undefined)
+  {
     double rating = jsonValue.toDouble();
-    if(rating != 0.0) {
+    if (rating != 0.0)
+    {
       game.rating = QString::number(rating / 100.0);
     }
   }
@@ -298,23 +343,34 @@ QList<QString> Igdb::getSearchNames(const QFileInfo &info)
 {
   QString baseName = info.completeBaseName();
 
-  if(!config->aliasMap[baseName].isEmpty()) {
+  if (!config->aliasMap[baseName].isEmpty())
+  {
     baseName = config->aliasMap[baseName];
-  } else if(info.suffix() == "lha") {
+  }
+  else if (info.suffix() == "lha")
+  {
     QString nameWithSpaces = config->whdLoadMap[baseName].first;
-    if(nameWithSpaces.isEmpty()) {
+    if (nameWithSpaces.isEmpty())
+    {
       baseName = NameTools::getNameWithSpaces(baseName);
-    } else {
+    }
+    else
+    {
       baseName = nameWithSpaces;
     }
-  } else if(config->platform == "scummvm") {
+  }
+  else if (config->platform == "scummvm")
+  {
     baseName = NameTools::getScummName(baseName, config->scummIni);
-  } else if((config->platform == "neogeo" ||
-	     config->platform == "arcade" ||
-	     config->platform == "mame-advmame" ||
-	     config->platform == "mame-libretro" ||
-	     config->platform == "mame-mame4all" ||
-	     config->platform == "fba") && !config->mameMap[baseName].isEmpty()) {
+  }
+  else if ((config->platform == "neogeo" ||
+            config->platform == "arcade" ||
+            config->platform == "mame-advmame" ||
+            config->platform == "mame-libretro" ||
+            config->platform == "mame-mame4all" ||
+            config->platform == "fba") &&
+           !config->mameMap[baseName].isEmpty())
+  {
     baseName = config->mameMap[baseName];
   }
   baseName = StrTools::stripBrackets(baseName);

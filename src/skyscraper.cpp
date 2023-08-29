@@ -47,10 +47,11 @@
 #include "skyscraper.h"
 #include "strtools.h"
 
-#include "emulationstation.h"
-#include "retrobat.h"
-#include "attractmode.h"
-#include "pegasus.h"
+// #include "emulationstation.h"
+#include "emulationstationde.h"
+// #include "retrobat.h"
+// #include "attractmode.h"
+// #include "pegasus.h"
 
 Skyscraper::Skyscraper(const QCommandLineParser &parser, const QString &currentDir)
 {
@@ -677,21 +678,26 @@ void Skyscraper::loadConfig(const QCommandLineParser &parser)
     config.frontend = settings.value("frontend").toString();
   }
   settings.endGroup();
-  if(parser.isSet("f") && (parser.value("f") == "emulationstation" ||
-			   parser.value("f") == "retrobat" ||
-			   parser.value("f") == "attractmode" ||
-			   parser.value("f") == "pegasus")) {
-    config.frontend = parser.value("f");
-  }
-  if(config.frontend == "emulationstation") {
-    frontend = new EmulationStation;
-  } else if(config.frontend == "retrobat") {
-    frontend = new RetroBat;
-  } else if(config.frontend == "attractmode") {
-    frontend = new AttractMode;
-  } else if(config.frontend == "pegasus") {
-    frontend = new Pegasus;
-  }
+  frontend = new EmulationStationDE;
+
+  // if(parser.isSet("f") && (parser.value("f") == "emulationstation" ||
+  //        parser.value("f") == "emulationstationde" ||
+	// 		   parser.value("f") == "retrobat" ||
+	// 		   parser.value("f") == "attractmode" ||
+	// 		   parser.value("f") == "pegasus")) {
+  //   config.frontend = parser.value("f");
+  // }
+  // if(config.frontend == "emulationstation") {
+  //   frontend = new EmulationStation;
+  // } else if(config.frontend == "emulationstationde") {
+
+  // } else if(config.frontend == "retrobat") {
+  //   frontend = new RetroBat;
+  // } else if(config.frontend == "attractmode") {
+  //   frontend = new AttractMode;
+  // } else if(config.frontend == "pegasus") {
+  //   frontend = new Pegasus;
+  // }
 
   frontend->setConfig(&config);
 
@@ -1578,7 +1584,6 @@ void Skyscraper::loadConfig(const QCommandLineParser &parser)
       // Always set refresh and unattend true if user has supplied filenames on
       // command line. That way they are cached, but game list is not changed and user isn't
       // asked about skipping and overwriting.
-      config.refresh = true;
       config.unattend = true;
     } else {
       printf("Filename: '\033[1;32m%s\033[0m' requested either on command line or with '--includefrom' not found!\n\nPlease verify the filename and try again...\n", requestedFile.toStdString().c_str());
@@ -1907,8 +1912,8 @@ void Skyscraper::setRegionPrios()
       config.regionPrios.append(region.trimmed());
     }
   } else {
-    config.regionPrios.append("eu");
     config.regionPrios.append("us");
+    config.regionPrios.append("eu");
     config.regionPrios.append("ss");
     config.regionPrios.append("uk");
     config.regionPrios.append("wor");

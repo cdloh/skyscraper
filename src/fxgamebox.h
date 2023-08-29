@@ -42,7 +42,6 @@ public:
 
 private:
   void fillWithAvg(const QImage &src, QImage &dst);
-
 };
 
 #endif // FXGAMEBOX_H

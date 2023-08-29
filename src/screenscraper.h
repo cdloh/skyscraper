@@ -62,20 +62,19 @@ private:
   void getScreenshot(GameEntry &game) override;
   void getWheel(GameEntry &game) override;
   void getMarquee(GameEntry &game) override;
-  void getTexture(GameEntry& game) override;
+  void getTexture(GameEntry &game) override;
   void getVideo(GameEntry &game) override;
 
   QString getJsonText(QJsonArray array, int attr, QList<QString> types = QList<QString>());
 
   QString getPlatformId(const QString platform) override;
 
-  void loadConfig(const QString& configPath);
+  void loadConfig(const QString &configPath);
   QMap<QString, int> platformToId;
 
   QString region;
   QString lang;
   QJsonObject jsonObj;
-
 };
 
 #endif // SCREENSCRAPER_H

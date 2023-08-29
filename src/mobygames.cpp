@@ -33,8 +33,8 @@
 #endif
 
 MobyGames::MobyGames(Settings *config,
-		     QSharedPointer<NetManager> manager)
-  : AbstractScraper(config, manager)
+                     QSharedPointer<NetManager> manager)
+    : AbstractScraper(config, manager)
 {
   connect(&limitTimer, &QTimer::timeout, &limiter, &QEventLoop::quit);
   limitTimer.setInterval(10000); // 10 second request limit
@@ -58,44 +58,49 @@ MobyGames::MobyGames(Settings *config,
 }
 
 void MobyGames::getSearchResults(QList<GameEntry> &gameEntries,
-				QString searchName, QString platform)
+                                 QString searchName, QString platform)
 {
   QString platformId = getPlatformId(config->platform);
 
   printf("Waiting as advised by MobyGames api restrictions...\n");
   limiter.exec();
-  netComm->request(searchUrlPre + "?api_key=" + StrTools::unMagic("175;229;170;189;188;202;211;117;164;165;185;209;164;234;180;155;199;209;224;231;193;190;173;175") + "&title=" + searchName + (platformId == "na"?"":"&platform=" + platformId));
+  netComm->request(searchUrlPre + "?api_key=" + StrTools::unMagic("175;229;170;189;188;202;211;117;164;165;185;209;164;234;180;155;199;209;224;231;193;190;173;175") + "&title=" + searchName + (platformId == "na" ? "" : "&platform=" + platformId));
   q.exec();
   data = netComm->getData();
 
   jsonDoc = QJsonDocument::fromJson(data);
-  if(jsonDoc.isEmpty()) {
+  if (jsonDoc.isEmpty())
+  {
     return;
   }
 
-  if(jsonDoc.object()["code"].toInt() == 429) {
+  if (jsonDoc.object()["code"].toInt() == 429)
+  {
     printf("\033[1;31mToo many requests! This is probably because some other Skyscraper user is currently using the 'mobygames' module. Please wait a while and try again.\n\nNow quitting...\033[0m\n");
     reqRemaining = 0;
   }
 
   QJsonArray jsonGames = jsonDoc.object()["games"].toArray();
 
-  while(!jsonGames.isEmpty()) {
+  while (!jsonGames.isEmpty())
+  {
     GameEntry game;
-    
+
     QJsonObject jsonGame = jsonGames.first().toObject();
-    
+
     game.id = QString::number(jsonGame["game_id"].toInt());
     game.title = jsonGame["title"].toString();
     game.miscData = QJsonDocument(jsonGame).toJson(QJsonDocument::Compact);
 
     QJsonArray jsonPlatforms = jsonGame["platforms"].toArray();
-    while(!jsonPlatforms.isEmpty()) {
+    while (!jsonPlatforms.isEmpty())
+    {
       QJsonObject jsonPlatform = jsonPlatforms.first().toObject();
       game.url = searchUrlPre + "/" + game.id + "/platforms/" + QString::number(jsonPlatform["platform_id"].toInt()) + "?api_key=" + StrTools::unMagic("175;229;170;189;188;202;211;117;164;165;185;209;164;234;180;155;199;209;224;231;193;190;173;175");
       game.platform = jsonPlatform["platform_name"].toString();
-      if(platformMatch(game.platform, platform)) {
-	gameEntries.append(game);
+      if (platformMatch(game.platform, platform))
+      {
+        gameEntries.append(game);
       }
       jsonPlatforms.removeFirst();
     }
@@ -112,14 +117,17 @@ void MobyGames::getGameData(GameEntry &game)
   data = netComm->getData();
 
   jsonDoc = QJsonDocument::fromJson(data);
-  if(jsonDoc.isEmpty()) {
+  if (jsonDoc.isEmpty())
+  {
     return;
   }
 
   jsonObj = QJsonDocument::fromJson(game.miscData).object();
 
-  for(int a = 0; a < fetchOrder.length(); ++a) {
-    switch(fetchOrder.at(a)) {
+  for (int a = 0; a < fetchOrder.length(); ++a)
+  {
+    switch (fetchOrder.at(a))
+    {
     case DESCRIPTION:
       getDescription(game);
       break;
@@ -145,17 +153,18 @@ void MobyGames::getGameData(GameEntry &game)
       getReleaseDate(game);
       break;
     case COVER:
-      if(config->cacheCovers) {
-	getCover(game);
+      if (config->cacheCovers)
+      {
+        getCover(game);
       }
       break;
     case SCREENSHOT:
-      if(config->cacheScreenshots) {
-	getScreenshot(game);
+      if (config->cacheScreenshots)
+      {
+        getScreenshot(game);
       }
       break;
-    default:
-      ;
+    default:;
     }
   }
 }
@@ -168,8 +177,10 @@ void MobyGames::getReleaseDate(GameEntry &game)
 void MobyGames::getPlayers(GameEntry &game)
 {
   QJsonArray jsonAttribs = jsonDoc.object()["attributes"].toArray();
-  for(int a = 0; a < jsonAttribs.count(); ++a) {
-    if(jsonAttribs.at(a).toObject()["attribute_category_name"].toString() == "Number of Players Supported") {
+  for (int a = 0; a < jsonAttribs.count(); ++a)
+  {
+    if (jsonAttribs.at(a).toObject()["attribute_category_name"].toString() == "Number of Players Supported")
+    {
       game.players = jsonAttribs.at(a).toObject()["attribute_name"].toString();
     }
   }
@@ -178,7 +189,8 @@ void MobyGames::getPlayers(GameEntry &game)
 void MobyGames::getTags(GameEntry &game)
 {
   QJsonArray jsonGenres = jsonObj["genres"].toArray();
-  for(int a = 0; a < jsonGenres.count(); ++a) {
+  for (int a = 0; a < jsonGenres.count(); ++a)
+  {
     game.tags.append(jsonGenres.at(a).toObject()["genre_name"].toString() + ", ");
   }
   game.tags = game.tags.left(game.tags.length() - 2);
@@ -187,56 +199,74 @@ void MobyGames::getTags(GameEntry &game)
 void MobyGames::getAges(GameEntry &game)
 {
   QJsonArray jsonAges = jsonDoc.object()["ratings"].toArray();
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "PEGI Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "PEGI Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
   }
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "ELSPA Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "ELSPA Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
   }
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "ESRB Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "ESRB Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
   }
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "USK Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "USK Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
   }
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "OFLC (Australia) Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "OFLC (Australia) Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
   }
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "SELL Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "SELL Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
   }
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "BBFC Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "BBFC Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
   }
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "OFLC (New Zealand) Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "OFLC (New Zealand) Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
   }
-  for(int a = 0; a < jsonAges.count(); ++a) {
-    if(jsonAges.at(a).toObject()["rating_system_name"].toString() == "VRC Rating") {
+  for (int a = 0; a < jsonAges.count(); ++a)
+  {
+    if (jsonAges.at(a).toObject()["rating_system_name"].toString() == "VRC Rating")
+    {
       game.ages = jsonAges.at(a).toObject()["rating_name"].toString();
       break;
     }
@@ -246,12 +276,15 @@ void MobyGames::getAges(GameEntry &game)
 void MobyGames::getPublisher(GameEntry &game)
 {
   QJsonArray jsonReleases = jsonDoc.object()["releases"].toArray();
-  for(int a = 0; a < jsonReleases.count(); ++a) {
+  for (int a = 0; a < jsonReleases.count(); ++a)
+  {
     QJsonArray jsonCompanies = jsonReleases.at(a).toObject()["companies"].toArray();
-    for(int b = 0; b < jsonCompanies.count(); ++b) {
-      if(jsonCompanies.at(b).toObject()["role"].toString() == "Published by") {
-	game.publisher = jsonCompanies.at(b).toObject()["company_name"].toString();
-	return;
+    for (int b = 0; b < jsonCompanies.count(); ++b)
+    {
+      if (jsonCompanies.at(b).toObject()["role"].toString() == "Published by")
+      {
+        game.publisher = jsonCompanies.at(b).toObject()["company_name"].toString();
+        return;
       }
     }
   }
@@ -260,12 +293,15 @@ void MobyGames::getPublisher(GameEntry &game)
 void MobyGames::getDeveloper(GameEntry &game)
 {
   QJsonArray jsonReleases = jsonDoc.object()["releases"].toArray();
-  for(int a = 0; a < jsonReleases.count(); ++a) {
+  for (int a = 0; a < jsonReleases.count(); ++a)
+  {
     QJsonArray jsonCompanies = jsonReleases.at(a).toObject()["companies"].toArray();
-    for(int b = 0; b < jsonCompanies.count(); ++b) {
-      if(jsonCompanies.at(b).toObject()["role"].toString() == "Developed by") {
-	game.developer = jsonCompanies.at(b).toObject()["company_name"].toString();
-	return;
+    for (int b = 0; b < jsonCompanies.count(); ++b)
+    {
+      if (jsonCompanies.at(b).toObject()["role"].toString() == "Developed by")
+      {
+        game.developer = jsonCompanies.at(b).toObject()["company_name"].toString();
+        return;
       }
     }
   }
@@ -282,9 +318,11 @@ void MobyGames::getDescription(GameEntry &game)
 void MobyGames::getRating(GameEntry &game)
 {
   QJsonValue jsonValue = jsonObj["moby_score"];
-  if(jsonValue != QJsonValue::Undefined) {
+  if (jsonValue != QJsonValue::Undefined)
+  {
     double rating = jsonValue.toDouble();
-    if(rating != 0.0) {
+    if (rating != 0.0)
+    {
       game.rating = QString::number(rating / 5.0);
     }
   }
@@ -299,57 +337,69 @@ void MobyGames::getCover(GameEntry &game)
   data = netComm->getData();
 
   jsonDoc = QJsonDocument::fromJson(data);
-  if(jsonDoc.isEmpty()) {
+  if (jsonDoc.isEmpty())
+  {
     return;
   }
 
   QString coverUrl = "";
-  bool foundFrontCover= false;
+  bool foundFrontCover = false;
 
-  for(const auto &region: regionPrios) {
+  for (const auto &region : regionPrios)
+  {
     QJsonArray jsonCoverGroups = jsonDoc.object()["cover_groups"].toArray();
-    while(!jsonCoverGroups.isEmpty()) {
+    while (!jsonCoverGroups.isEmpty())
+    {
       bool foundRegion = false;
       QJsonArray jsonCountries = jsonCoverGroups.first().toObject()["countries"].toArray();
-      while(!jsonCountries.isEmpty()) {
-	if(getRegionShort(jsonCountries.first().toString().simplified()) == region) {
-	  foundRegion = true;
-	  break;
-	}
-	jsonCountries.removeFirst();
+      while (!jsonCountries.isEmpty())
+      {
+        if (getRegionShort(jsonCountries.first().toString().simplified()) == region)
+        {
+          foundRegion = true;
+          break;
+        }
+        jsonCountries.removeFirst();
       }
-      if(!foundRegion) {
-	jsonCoverGroups.removeFirst();
-	continue;
+      if (!foundRegion)
+      {
+        jsonCoverGroups.removeFirst();
+        continue;
       }
       QJsonArray jsonCovers = jsonCoverGroups.first().toObject()["covers"].toArray();
-      while(!jsonCovers.isEmpty()) {
-	QJsonObject jsonCover = jsonCovers.first().toObject();
-	if(jsonCover["scan_of"].toString().toLower().simplified().contains("front cover")) {
-	  coverUrl = jsonCover["image"].toString();
-	  foundFrontCover= true;
-	  break;
-	}
-	jsonCovers.removeFirst();
+      while (!jsonCovers.isEmpty())
+      {
+        QJsonObject jsonCover = jsonCovers.first().toObject();
+        if (jsonCover["scan_of"].toString().toLower().simplified().contains("front cover"))
+        {
+          coverUrl = jsonCover["image"].toString();
+          foundFrontCover = true;
+          break;
+        }
+        jsonCovers.removeFirst();
       }
-      if(foundFrontCover) {
-	break;
+      if (foundFrontCover)
+      {
+        break;
       }
       jsonCoverGroups.removeFirst();
     }
-    if(foundFrontCover) {
+    if (foundFrontCover)
+    {
       break;
     }
   }
 
   coverUrl.replace("http://", "https://"); // For some reason the links are http but they are always redirected to https
 
-  if(!coverUrl.isEmpty()) {
+  if (!coverUrl.isEmpty())
+  {
     netComm->request(coverUrl);
     q.exec();
     QImage image;
-    if(netComm->getError() == QNetworkReply::NoError &&
-       image.loadFromData(netComm->getData())) {
+    if (netComm->getError() == QNetworkReply::NoError &&
+        image.loadFromData(netComm->getData()))
+    {
       game.coverData = netComm->getData();
     }
   }
@@ -364,17 +414,20 @@ void MobyGames::getScreenshot(GameEntry &game)
   data = netComm->getData();
 
   jsonDoc = QJsonDocument::fromJson(data);
-  if(jsonDoc.isEmpty()) {
+  if (jsonDoc.isEmpty())
+  {
     return;
   }
 
   QJsonArray jsonScreenshots = jsonDoc.object()["screenshots"].toArray();
 
-  if(jsonScreenshots.count() < 1) {
+  if (jsonScreenshots.count() < 1)
+  {
     return;
   }
   int chosen = 1;
-  if(jsonScreenshots.count() >= 3) {
+  if (jsonScreenshots.count() >= 3)
+  {
     // First 2 are almost always not ingame, so skip those if we have 3 or more
 #if QT_VERSION >= 0x050a00
     chosen = (QRandomGenerator::global()->generate() % jsonScreenshots.count() - 3) + 3;
@@ -385,173 +438,333 @@ void MobyGames::getScreenshot(GameEntry &game)
   netComm->request(jsonScreenshots.at(chosen).toObject()["image"].toString().replace("http://", "https://"));
   q.exec();
   QImage image;
-  if(netComm->getError() == QNetworkReply::NoError &&
-     image.loadFromData(netComm->getData())) {
+  if (netComm->getError() == QNetworkReply::NoError &&
+      image.loadFromData(netComm->getData()))
+  {
     game.screenshotData = netComm->getData();
   }
 }
 
 QString MobyGames::getPlatformId(const QString platform)
 {
-  if(platform == "3do") {
+  if (platform == "3do")
+  {
     return "35";
-  } else if(platform == "3ds") {
+  }
+  else if (platform == "3ds")
+  {
     return "101";
-  } else if(platform == "amiga") {
+  }
+  else if (platform == "amiga")
+  {
     return "19";
-  } else if(platform == "aga") {
+  }
+  else if (platform == "aga")
+  {
     return "19";
-  } else if(platform == "cd32") {
+  }
+  else if (platform == "cd32")
+  {
     return "56";
-  } else if(platform == "cdtv") {
+  }
+  else if (platform == "cdtv")
+  {
     return "83";
-  } else if(platform == "amstradcpc") {
+  }
+  else if (platform == "amstradcpc")
+  {
     return "60";
-  } else if(platform == "apple2") {
+  }
+  else if (platform == "apple2")
+  {
     return "31";
-  } else if(platform == "arcade") {
+  }
+  else if (platform == "arcade")
+  {
     return "na";
-  } else if(platform == "arcadia") {
+  }
+  else if (platform == "arcadia")
+  {
     return "162";
-  } else if(platform == "astrocde") {
+  }
+  else if (platform == "astrocde")
+  {
     return "160";
-  } else if(platform == "atari800") {
+  }
+  else if (platform == "atari800")
+  {
     return "39";
-  } else if(platform == "atari2600") {
+  }
+  else if (platform == "atari2600")
+  {
     return "28";
-  } else if(platform == "atari5200") {
+  }
+  else if (platform == "atari5200")
+  {
     return "33";
-  } else if(platform == "atari7800") {
+  }
+  else if (platform == "atari7800")
+  {
     return "34";
-  } else if(platform == "atarijaguar") {
+  }
+  else if (platform == "atarijaguar")
+  {
     return "17";
-  } else if(platform == "atarilynx") {
+  }
+  else if (platform == "atarilynx")
+  {
     return "18";
-  } else if(platform == "atarist") {
+  }
+  else if (platform == "atarist")
+  {
     return "24";
-  } else if(platform == "c16") {
+  }
+  else if (platform == "c16")
+  {
     return "115";
-  } else if(platform == "c64") {
+  }
+  else if (platform == "c64")
+  {
     return "27";
-  } else if(platform == "c128") {
+  }
+  else if (platform == "c128")
+  {
     return "61";
-  } else if(platform == "coco") {
+  }
+  else if (platform == "coco")
+  {
     return "62";
-  } else if(platform == "coleco") {
+  }
+  else if (platform == "coleco")
+  {
     return "29";
-  } else if(platform == "daphne") {
+  }
+  else if (platform == "daphne")
+  {
     return "na";
-  } else if(platform == "dragon32") {
+  }
+  else if (platform == "dragon32")
+  {
     return "79";
-  } else if(platform == "dreamcast") {
+  }
+  else if (platform == "dreamcast")
+  {
     return "8";
-  } else if(platform == "fba") {
+  }
+  else if (platform == "fba")
+  {
     return "na";
-  } else if(platform == "fds") {
+  }
+  else if (platform == "fds")
+  {
     return "22";
-  } else if(platform == "gameandwatch") {
+  }
+  else if (platform == "gameandwatch")
+  {
     return "na";
-  } else if(platform == "gamegear") {
+  }
+  else if (platform == "gamegear")
+  {
     return "25";
-  } else if(platform == "gb") {
+  }
+  else if (platform == "gb")
+  {
     return "10";
-  } else if(platform == "gba") {
+  }
+  else if (platform == "gba")
+  {
     return "12";
-  } else if(platform == "gbc") {
+  }
+  else if (platform == "gbc")
+  {
     return "11";
-  } else if(platform == "gc") {
+  }
+  else if (platform == "gc")
+  {
     return "14";
-  } else if(platform == "genesis") {
+  }
+  else if (platform == "genesis")
+  {
     return "16";
-  } else if(platform == "intellivision") {
+  }
+  else if (platform == "intellivision")
+  {
     return "30";
-  } else if(platform == "mame-advmame") {
+  }
+  else if (platform == "mame-advmame")
+  {
     return "na";
-  } else if(platform == "mame-libretro") {
+  }
+  else if (platform == "mame-libretro")
+  {
     return "na";
-  } else if(platform == "mame-mame4all") {
+  }
+  else if (platform == "mame-mame4all")
+  {
     return "na";
-  } else if(platform == "mastersystem") {
+  }
+  else if (platform == "mastersystem")
+  {
     return "26";
-  } else if(platform == "megacd") {
+  }
+  else if (platform == "megacd")
+  {
     return "20";
-  } else if(platform == "megadrive") {
+  }
+  else if (platform == "megadrive")
+  {
     return "16";
-  } else if(platform == "msx") {
+  }
+  else if (platform == "msx")
+  {
     return "57";
-  } else if(platform == "n64") {
+  }
+  else if (platform == "n64")
+  {
     return "9";
-  } else if(platform == "nds") {
+  }
+  else if (platform == "nds")
+  {
     return "44";
-  } else if(platform == "neogeo") {
+  }
+  else if (platform == "neogeo")
+  {
     return "36";
-  } else if(platform == "nes") {
+  }
+  else if (platform == "nes")
+  {
     return "22";
-  } else if(platform == "ngp") {
+  }
+  else if (platform == "ngp")
+  {
     return "52";
-  } else if(platform == "ngpc") {
+  }
+  else if (platform == "ngpc")
+  {
     return "53";
-  } else if(platform == "oric") {
+  }
+  else if (platform == "oric")
+  {
     return "111";
-  } else if(platform == "pc") {
+  }
+  else if (platform == "pc")
+  {
     return "na";
-  } else if(platform == "pc88") {
+  }
+  else if (platform == "pc88")
+  {
     return "94";
-  } else if(platform == "pc98") {
+  }
+  else if (platform == "pc98")
+  {
     return "95";
-  } else if(platform == "pcfx") {
+  }
+  else if (platform == "pcfx")
+  {
     return "59";
-  } else if(platform == "pcengine") {
+  }
+  else if (platform == "pcengine")
+  {
     return "na";
-  } else if(platform == "pokemini") {
+  }
+  else if (platform == "pokemini")
+  {
     return "152";
-  } else if(platform == "ports") {
+  }
+  else if (platform == "ports")
+  {
     return "na";
-  } else if(platform == "ps2") {
+  }
+  else if (platform == "ps2")
+  {
     return "7";
-  } else if(platform == "psp") {
+  }
+  else if (platform == "psp")
+  {
     return "46";
-  } else if(platform == "psx") {
+  }
+  else if (platform == "psx")
+  {
     return "6";
-  } else if(platform == "saturn") {
+  }
+  else if (platform == "saturn")
+  {
     return "23";
-  } else if(platform == "scummvm") {
+  }
+  else if (platform == "scummvm")
+  {
     return "na";
-  } else if(platform == "sega32x") {
+  }
+  else if (platform == "sega32x")
+  {
     return "21";
-  } else if(platform == "segacd") {
+  }
+  else if (platform == "segacd")
+  {
     return "20";
-  } else if(platform == "sg-1000") {
+  }
+  else if (platform == "sg-1000")
+  {
     return "114";
-  } else if(platform == "snes") {
+  }
+  else if (platform == "snes")
+  {
     return "15";
-  } else if(platform == "ti99") {
+  }
+  else if (platform == "ti99")
+  {
     return "47";
-  } else if(platform == "trs-80") {
+  }
+  else if (platform == "trs-80")
+  {
     return "58";
-  } else if(platform == "vectrex") {
+  }
+  else if (platform == "vectrex")
+  {
     return "37";
-  } else if(platform == "vic20") {
+  }
+  else if (platform == "vic20")
+  {
     return "43";
-  } else if(platform == "videopac") {
+  }
+  else if (platform == "videopac")
+  {
     return "128";
-  } else if(platform == "virtualboy") {
+  }
+  else if (platform == "virtualboy")
+  {
     return "38";
-  } else if(platform == "wii") {
+  }
+  else if (platform == "wii")
+  {
     return "82";
-  } else if(platform == "wonderswan") {
+  }
+  else if (platform == "wonderswan")
+  {
     return "48";
-  } else if(platform == "wonderswancolor") {
+  }
+  else if (platform == "wonderswancolor")
+  {
     return "49";
-  } else if(platform == "x68000") {
+  }
+  else if (platform == "x68000")
+  {
     return "106";
-  } else if(platform == "x1") {
+  }
+  else if (platform == "x1")
+  {
     return "121";
-  } else if(platform == "zmachine") {
+  }
+  else if (platform == "zmachine")
+  {
     return "169";
-  } else if(platform == "zx81") {
+  }
+  else if (platform == "zx81")
+  {
     return "119";
-  } else if(platform == "zxspectrum") {
+  }
+  else if (platform == "zxspectrum")
+  {
     return "41";
   }
   return "na";
@@ -559,67 +772,128 @@ QString MobyGames::getPlatformId(const QString platform)
 
 QString MobyGames::getRegionShort(const QString &region)
 {
-  if(region == "Germany") {
+  if (region == "Germany")
+  {
     return "de";
-  } else if(region == "Australia") {
+  }
+  else if (region == "Australia")
+  {
     return "au";
-  } else if(region == "Brazil") {
+  }
+  else if (region == "Brazil")
+  {
     return "br";
-  } else if(region == "Bulgaria") {
+  }
+  else if (region == "Bulgaria")
+  {
     return "bg";
-  } else if(region == "Canada") {
+  }
+  else if (region == "Canada")
+  {
     return "ca";
-  } else if(region == "Chile") {
+  }
+  else if (region == "Chile")
+  {
     return "cl";
-  } else if(region == "China") {
+  }
+  else if (region == "China")
+  {
     return "cn";
-  } else if(region == "South Korea") {
+  }
+  else if (region == "South Korea")
+  {
     return "kr";
-  } else if(region == "Denmark") {
+  }
+  else if (region == "Denmark")
+  {
     return "dk";
-  } else if(region == "Spain") {
+  }
+  else if (region == "Spain")
+  {
     return "sp";
-  } else if(region == "Finland") {
+  }
+  else if (region == "Finland")
+  {
     return "fi";
-  } else if(region == "France") {
+  }
+  else if (region == "France")
+  {
     return "fr";
-  } else if(region == "Greece") {
+  }
+  else if (region == "Greece")
+  {
     return "gr";
-  } else if(region == "Hungary") {
+  }
+  else if (region == "Hungary")
+  {
     return "hu";
-  } else if(region == "Israel") {
+  }
+  else if (region == "Israel")
+  {
     return "il";
-  } else if(region == "Italy") {
+  }
+  else if (region == "Italy")
+  {
     return "it";
-  } else if(region == "Japan") {
+  }
+  else if (region == "Japan")
+  {
     return "jp";
-  } else if(region == "Worldwide") {
+  }
+  else if (region == "Worldwide")
+  {
     return "wor";
-  } else if(region == "Norway") {
+  }
+  else if (region == "Norway")
+  {
     return "no";
-  } else if(region == "New Zealand") {
+  }
+  else if (region == "New Zealand")
+  {
     return "nz";
-  } else if(region == "Netherlands") {
+  }
+  else if (region == "Netherlands")
+  {
     return "nl";
-  } else if(region == "Poland") {
+  }
+  else if (region == "Poland")
+  {
     return "pl";
-  } else if(region == "Portugal") {
+  }
+  else if (region == "Portugal")
+  {
     return "pt";
-  } else if(region == "Czech Republic") {
+  }
+  else if (region == "Czech Republic")
+  {
     return "cz";
-  } else if(region == "United Kingdom") {
+  }
+  else if (region == "United Kingdom")
+  {
     return "uk";
-  } else if(region == "Russia") {
+  }
+  else if (region == "Russia")
+  {
     return "ru";
-  } else if(region == "Slovakia") {
+  }
+  else if (region == "Slovakia")
+  {
     return "sk";
-  } else if(region == "Sweden") {
+  }
+  else if (region == "Sweden")
+  {
     return "se";
-  } else if(region == "Taiwan") {
+  }
+  else if (region == "Taiwan")
+  {
     return "tw";
-  } else if(region == "Turkey") {
+  }
+  else if (region == "Turkey")
+  {
     return "tr";
-  } else if(region == "United States") {
+  }
+  else if (region == "United States")
+  {
     return "us";
   }
   return "na";

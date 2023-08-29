@@ -37,12 +37,11 @@ public:
 
 private:
   void getSearchResults(QList<GameEntry> &gameEntries,
-			QString searchName, QString platform) override;
+                        QString searchName, QString platform) override;
   void getDescription(GameEntry &game) override;
   void getCover(GameEntry &game) override;
   void getScreenshot(GameEntry &game) override;
   void getReleaseDate(GameEntry &game) override;
-
 };
 
 #endif // WORLDOFSPECTRUM_H

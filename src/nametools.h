@@ -37,8 +37,8 @@ public:
   static QString getScummName(const QString baseName, const QString scummIni);
   static QString getNameWithSpaces(const QString baseName);
   static QString getUrlQueryName(const QString baseName,
-				 const int words = -1,
-				 const QString spaceChar = "+");
+                                 const int words = -1,
+                                 const QString spaceChar = "+");
   static bool hasIntegerNumeral(const QString baseName);
   static bool hasRomanNumeral(const QString baseName);
   static QString convertToIntegerNumeral(const QString baseName);

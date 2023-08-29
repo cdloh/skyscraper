@@ -41,18 +41,21 @@ QImage FxContrast::applyEffect(const QImage &src, const Layer &layer)
   double factor = (259.0 * ((double)contrast + 255.0)) / (255.0 * (259.0 - (double)contrast));
 
   double index[256];
-  for(int a = 0; a < 256; ++a) {
+  for (int a = 0; a < 256; ++a)
+  {
     index[a] = truncate(round(factor * a));
   }
 
-  for(int y = 0; y < canvas.height(); ++y) {
-    QRgb* line = (QRgb *)canvas.scanLine(y);
-    for(int x = 0; x < canvas.width(); ++x) {
-      
+  for (int y = 0; y < canvas.height(); ++y)
+  {
+    QRgb *line = (QRgb *)canvas.scanLine(y);
+    for (int x = 0; x < canvas.width(); ++x)
+    {
+
       line[x] = qPremultiply(qRgba(index[qRed(line[x])],
-				   index[qGreen(line[x])],
-				   index[qBlue(line[x])],
-				   qAlpha(line[x])));
+                                   index[qGreen(line[x])],
+                                   index[qBlue(line[x])],
+                                   qAlpha(line[x])));
     }
   }
 
@@ -61,10 +64,12 @@ QImage FxContrast::applyEffect(const QImage &src, const Layer &layer)
 
 int FxContrast::truncate(int value)
 {
-  if(value > 255) {
+  if (value > 255)
+  {
     value = 255;
   }
-  if(value < 0) {
+  if (value < 0)
+  {
     value = 0;
   }
   return value;

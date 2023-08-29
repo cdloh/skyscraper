@@ -42,10 +42,10 @@ private:
   QTimer limitTimer;
   QEventLoop limiter;
 
-  QList<QPair<QString, QString > > headers;
-  
+  QList<QPair<QString, QString>> headers;
+
   void getSearchResults(QList<GameEntry> &gameEntries,
-			QString searchName, QString platform) override;
+                        QString searchName, QString platform) override;
   void getGameData(GameEntry &game) override;
   void getReleaseDate(GameEntry &game) override;
   void getPlayers(GameEntry &game) override;

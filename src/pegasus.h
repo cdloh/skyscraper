@@ -54,9 +54,8 @@ private:
   QString fromPreservedHeader(const QString &key, const QString &suggested);
   void removePreservedHeader(const QString &key);
   QString toPegasusFormat(const QString &key, const QString &value);
-  QList<QPair<QString, QString> > headerPairs;
+  QList<QPair<QString, QString>> headerPairs;
   QString tab = "  ";
-
 };
 
 #endif // PEGASUS_H

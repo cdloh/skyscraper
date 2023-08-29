@@ -37,7 +37,8 @@
 #include "queue.h"
 #include "settings.h"
 
-struct Resource {
+struct Resource
+{
   QString cacheId = "";
   int version = 1;
   QString type = "";
@@ -46,7 +47,8 @@ struct Resource {
   qint64 timestamp = 0;
 };
 
-struct ResCounts {
+struct ResCounts
+{
   int titles;
   int platforms;
   int descriptions;
@@ -73,12 +75,12 @@ public:
   bool read();
   void printPriorities(QString cacheId);
   void editResources(QSharedPointer<Queue> queue,
-		     const QString &command = "",
-		     const QString &type = "");
+                     const QString &command = "",
+                     const QString &type = "");
   bool purgeAll(const bool unattend = false);
   bool purgeResources(QString purgeStr);
   bool vacuumResources(const QString inputFolder, const QString filters,
-		       const int verbosity, const bool unattend = false);
+                       const int verbosity, const bool unattend = false);
   void assembleReport(const Settings &config, const QString filters);
   void showStats(int verbosity);
   void readPriorities();
@@ -92,33 +94,33 @@ public:
   void merge(Cache &mergeCache, bool overwrite, const QString &mergeCacheFolder);
   QList<Resource> getResources();
 
- private:
+private:
   QDir cacheDir;
   QMutex cacheMutex;
   QMutex quickIdMutex;
 
-  QMap<QString, QList<QString> > prioMap;
+  QMap<QString, QList<QString>> prioMap;
 
   QMap<QString, ResCounts> resCountsMap;
 
   QList<Resource> resources;
-  QMap<QString, QPair<qint64, QString> > quickIds; // filePath, timestamp + cacheId for quick lookup
+  QMap<QString, QPair<qint64, QString>> quickIds; // filePath, timestamp + cacheId for quick lookup
 
   QList<QFileInfo> getFileInfos(const QString &inputFolder, const QString &filter, const bool subdirs = true);
   QList<QString> getCacheIdList(const QList<QFileInfo> &fileInfos);
 
   void addToResCounts(const QString source, const QString type);
   void addResource(Resource &resource, GameEntry &entry, const QString &cacheAbsolutePath,
-		   const Settings &config, QString &output);
+                   const Settings &config, QString &output);
   void verifyFiles(QDirIterator &dirIt, int &filesDeleted, int &noDelete, QString resType);
   void verifyResources(int &resourcesDeleted);
   bool fillType(QString &type, QList<Resource> &matchingResources,
-		QString &result, QString &source);
+                QString &result, QString &source);
   bool doVideoConvert(Resource &resource,
-		      QString &cacheFile,
-		      const QString &cacheAbsolutePath,
-		      const Settings &config,
-		      QString &output);
+                      QString &cacheFile,
+                      const QString &cacheAbsolutePath,
+                      const Settings &config,
+                      QString &output);
   bool hasAlpha(const QImage &image);
   int resAtLoad = 0;
 };

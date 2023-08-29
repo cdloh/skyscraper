@@ -148,7 +148,7 @@ QString Pegasus::makeAbsolute(const QString &filePath, const QString &inputFolde
 }
 
 
-bool Pegasus::skipExisting(QList<GameEntry> &gameEntries, QSharedPointer<Queue> queue) 
+bool Pegasus::skipExisting(QList<GameEntry> &gameEntries, QSharedPointer<Queue> queue)
 {
   gameEntries = oldEntries;
 
@@ -238,7 +238,7 @@ void Pegasus::removePreservedHeader(const QString &key)
 QString Pegasus::toPegasusFormat(const QString &key, const QString &value)
 {
   QString pegasusFormat = value;
-  
+
   QRegularExpressionMatch match;
   match = QRegularExpression("\\n[\\t ]*\\n").match(pegasusFormat);
   for(const auto &capture: match.capturedTexts()) {

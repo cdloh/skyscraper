@@ -29,8 +29,8 @@
 #include "strtools.h"
 
 ArcadeDB::ArcadeDB(Settings *config,
-		   QSharedPointer<NetManager> manager)
-  : AbstractScraper(config, manager)
+                   QSharedPointer<NetManager> manager)
+    : AbstractScraper(config, manager)
 {
   baseUrl = "http://adb.arcadeitalia.net";
 
@@ -49,22 +49,25 @@ ArcadeDB::ArcadeDB(Settings *config,
 }
 
 void ArcadeDB::getSearchResults(QList<GameEntry> &gameEntries,
-				QString searchName, QString platform)
+                                QString searchName, QString platform)
 {
   netComm->request(searchUrlPre + searchName);
   q.exec();
   data = netComm->getData();
 
-  if(data.indexOf("{\"release\":1,\"result\":[]}") != -1) {
+  if (data.indexOf("{\"release\":1,\"result\":[]}") != -1)
+  {
     return;
   }
   jsonDoc = QJsonDocument::fromJson(data);
-  if(jsonDoc.isEmpty()) {
+  if (jsonDoc.isEmpty())
+  {
     return;
   }
   jsonObj = jsonDoc.object().value("result").toArray().first().toObject();
 
-  if(jsonObj.value("title") == QJsonValue::Undefined) {
+  if (jsonObj.value("title") == QJsonValue::Undefined)
+  {
     return;
   }
 
@@ -77,8 +80,10 @@ void ArcadeDB::getSearchResults(QList<GameEntry> &gameEntries,
 
 void ArcadeDB::getGameData(GameEntry &game)
 {
-  for(int a = 0; a < fetchOrder.length(); ++a) {
-    switch(fetchOrder.at(a)) {
+  for (int a = 0; a < fetchOrder.length(); ++a)
+  {
+    switch (fetchOrder.at(a))
+    {
     case DESCRIPTION:
       getDescription(game);
       break;
@@ -101,32 +106,36 @@ void ArcadeDB::getGameData(GameEntry &game)
       getReleaseDate(game);
       break;
     case COVER:
-      if(config->cacheCovers) {
-	getCover(game);
+      if (config->cacheCovers)
+      {
+        getCover(game);
       }
       break;
     case SCREENSHOT:
-      if(config->cacheScreenshots) {
-	getScreenshot(game);
+      if (config->cacheScreenshots)
+      {
+        getScreenshot(game);
       }
       break;
     case WHEEL:
-      if(config->cacheWheels) {
-	getWheel(game);
+      if (config->cacheWheels)
+      {
+        getWheel(game);
       }
       break;
     case MARQUEE:
-      if(config->cacheMarquees) {
-	getMarquee(game);
+      if (config->cacheMarquees)
+      {
+        getMarquee(game);
       }
       break;
     case VIDEO:
-      if(config->videos) {
-	getVideo(game);
+      if (config->videos)
+      {
+        getVideo(game);
       }
       break;
-    default:
-      ;
+    default:;
     }
   }
 }
@@ -154,28 +163,33 @@ void ArcadeDB::getPublisher(GameEntry &game)
 void ArcadeDB::getDescription(GameEntry &game)
 {
   game.description = jsonObj.value("history").toString();
-  if(game.description.contains("- TECHNICAL")) {
+  if (game.description.contains("- TECHNICAL"))
+  {
     game.description = game.description.left(game.description.indexOf("- TECHNICAL")).trimmed();
   }
 }
 
 void ArcadeDB::getCover(GameEntry &game)
 {
-  for(const auto &key: jsonObj.keys()) {
-    if(key == "url_image_flyer" ||
-       key == "url_image_title") {
-      if(jsonObj.value(key).toString().isEmpty()) {
-	continue;
+  for (const auto &key : jsonObj.keys())
+  {
+    if (key == "url_image_flyer" ||
+        key == "url_image_title")
+    {
+      if (jsonObj.value(key).toString().isEmpty())
+      {
+        continue;
       }
       netComm->request(jsonObj.value(key).toString());
       q.exec();
       {
-	QImage image;
-	if(netComm->getError() == QNetworkReply::NoError &&
-	   image.loadFromData(netComm->getData())) {
-	  game.coverData = netComm->getData();
-	  return;
-	}
+        QImage image;
+        if (netComm->getError() == QNetworkReply::NoError &&
+            image.loadFromData(netComm->getData()))
+        {
+          game.coverData = netComm->getData();
+          return;
+        }
       }
     }
   }
@@ -183,15 +197,17 @@ void ArcadeDB::getCover(GameEntry &game)
 
 void ArcadeDB::getScreenshot(GameEntry &game)
 {
-  if(!jsonObj.contains("url_image_ingame") ||
-     jsonObj.value("url_image_ingame").toString().isEmpty()) {
+  if (!jsonObj.contains("url_image_ingame") ||
+      jsonObj.value("url_image_ingame").toString().isEmpty())
+  {
     return;
   }
   netComm->request(jsonObj.value("url_image_ingame").toString());
   q.exec();
   QImage image;
-  if(netComm->getError() == QNetworkReply::NoError &&
-     image.loadFromData(netComm->getData())) {
+  if (netComm->getError() == QNetworkReply::NoError &&
+      image.loadFromData(netComm->getData()))
+  {
     game.screenshotData = netComm->getData();
   }
 }
@@ -201,40 +217,47 @@ void ArcadeDB::getWheel(GameEntry &game)
   netComm->request("http://adb.arcadeitalia.net/media/mame.current/decals/" + jsonObj["game_name"].toString() + ".png");
   q.exec();
   QImage image;
-  if(netComm->getError() == QNetworkReply::NoError &&
-     image.loadFromData(netComm->getData())) {
+  if (netComm->getError() == QNetworkReply::NoError &&
+      image.loadFromData(netComm->getData()))
+  {
     game.wheelData = netComm->getData();
   }
 }
 
 void ArcadeDB::getMarquee(GameEntry &game)
 {
-  if(!jsonObj.contains("url_image_marquee") ||
-     jsonObj.value("url_image_marquee").toString().isEmpty()) {
+  if (!jsonObj.contains("url_image_marquee") ||
+      jsonObj.value("url_image_marquee").toString().isEmpty())
+  {
     return;
   }
   netComm->request(jsonObj.value("url_image_marquee").toString());
   q.exec();
   QImage image;
-  if(netComm->getError() == QNetworkReply::NoError &&
-     image.loadFromData(netComm->getData())) {
+  if (netComm->getError() == QNetworkReply::NoError &&
+      image.loadFromData(netComm->getData()))
+  {
     game.marqueeData = netComm->getData();
   }
 }
 
 void ArcadeDB::getVideo(GameEntry &game)
 {
-  if(!jsonObj.contains("url_video_shortplay") ||
-     jsonObj.value("url_video_shortplay").toString().isEmpty()) {
+  if (!jsonObj.contains("url_video_shortplay") ||
+      jsonObj.value("url_video_shortplay").toString().isEmpty())
+  {
     return;
   }
   netComm->request(jsonObj.value("url_video_shortplay").toString());
   q.exec();
   game.videoData = netComm->getData();
-  if(netComm->getError() == QNetworkReply::NoError &&
-     game.videoData.length() > 4096) {
+  if (netComm->getError() == QNetworkReply::NoError &&
+      game.videoData.length() > 4096)
+  {
     game.videoFormat = "mp4";
-  } else {
+  }
+  else
+  {
     game.videoData = "";
   }
 }

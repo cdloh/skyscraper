@@ -38,11 +38,10 @@ public:
   bool setFile(QString filename);
   QList<GameEntry> getEntries(QString inputFolder);
   void addEntries(const QDomNodeList &nodes, QList<GameEntry> &gameEntries,
-		  const QString &inputFolder);
+                  const QString &inputFolder);
 
 private:
   QString makeAbsolute(QString filePath, const QString &inputFolder);
-
 };
 
 #endif // XMLREADER_H

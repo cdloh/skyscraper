@@ -28,7 +28,8 @@
 
 #include <QMap>
 
-struct Settings {
+struct Settings
+{
   QString currentDir = "";
 
   QString cacheFolder = "";
@@ -102,7 +103,7 @@ struct Settings {
 
   bool videos = false;
   bool videoPreferNormalized = true;
-  int videoSizeLimit = 100*1024*1024;
+  int videoSizeLimit = 100 * 1024 * 1024;
   QString videoConvertCommand = "";
   QString videoConvertExtension = "";
   bool symlink = false;
@@ -110,7 +111,7 @@ struct Settings {
   bool cacheCovers = true;
   bool skipExistingCovers = false;
   bool cacheScreenshots = true;
-  bool skipExistingScreenshots= false;
+  bool skipExistingScreenshots = false;
   bool cropBlack = true; // If true, will crop away black borders around screenshots
   bool cacheWheels = true;
   bool skipExistingWheels = false;
@@ -118,7 +119,7 @@ struct Settings {
   bool skipExistingMarquees = false;
   bool skipExistingTextures = false;
   bool cacheTextures = true;
-  
+
   QString user = "";
   QString password = "";
   QString lang = "";
@@ -131,11 +132,10 @@ struct Settings {
   QMap<QString, QImage> resources;
   QMap<QString, QString> mameMap;
   QMap<QString, QString> aliasMap;
-  QMap<QString, QPair<QString, QString> > whdLoadMap;
+  QMap<QString, QPair<QString, QString>> whdLoadMap;
 
   QList<QString> regionPrios;
   QList<QString> langPrios;
-
 };
 
 #endif // SETTINGS_H

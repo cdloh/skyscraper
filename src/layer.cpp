@@ -44,52 +44,92 @@ void Layer::setResType(const QString &resType)
 
 void Layer::setMode(const QString &mode)
 {
-  if(mode == "multiply") {
+  if (mode == "multiply")
+  {
     this->mode = QPainter::CompositionMode_Multiply;
-  } else if(mode == "screen") {
+  }
+  else if (mode == "screen")
+  {
     this->mode = QPainter::CompositionMode_Screen;
-  } else if(mode == "overlay") {
+  }
+  else if (mode == "overlay")
+  {
     this->mode = QPainter::CompositionMode_Overlay;
-  } else if(mode == "darken") {
+  }
+  else if (mode == "darken")
+  {
     this->mode = QPainter::CompositionMode_Darken;
-  } else if(mode == "lighten") {
+  }
+  else if (mode == "lighten")
+  {
     this->mode = QPainter::CompositionMode_Lighten;
-  } else if(mode == "colordodge") {
+  }
+  else if (mode == "colordodge")
+  {
     this->mode = QPainter::CompositionMode_ColorDodge;
-  } else if(mode == "colorburn") {
+  }
+  else if (mode == "colorburn")
+  {
     this->mode = QPainter::CompositionMode_ColorBurn;
-  } else if(mode == "hardlight") {
+  }
+  else if (mode == "hardlight")
+  {
     this->mode = QPainter::CompositionMode_HardLight;
-  } else if(mode == "softlight") {
+  }
+  else if (mode == "softlight")
+  {
     this->mode = QPainter::CompositionMode_SoftLight;
-  } else if(mode == "difference") {
+  }
+  else if (mode == "difference")
+  {
     this->mode = QPainter::CompositionMode_Difference;
-  } else if(mode == "exclusion") {
+  }
+  else if (mode == "exclusion")
+  {
     this->mode = QPainter::CompositionMode_Exclusion;
-  } else if(mode == "sourcein") {
+  }
+  else if (mode == "sourcein")
+  {
     this->mode = QPainter::CompositionMode_SourceIn;
-  } else if(mode == "destinationin") {
+  }
+  else if (mode == "destinationin")
+  {
     this->mode = QPainter::CompositionMode_DestinationIn;
-  } else if(mode == "sourceout") {
+  }
+  else if (mode == "sourceout")
+  {
     this->mode = QPainter::CompositionMode_SourceOut;
-  } else if(mode == "destinationout") {
+  }
+  else if (mode == "destinationout")
+  {
     this->mode = QPainter::CompositionMode_DestinationOut;
-  } else if(mode == "sourceatop") {
+  }
+  else if (mode == "sourceatop")
+  {
     this->mode = QPainter::CompositionMode_SourceAtop;
-  } else if(mode == "destinationatop") {
+  }
+  else if (mode == "destinationatop")
+  {
     this->mode = QPainter::CompositionMode_DestinationAtop;
-  } else if(mode == "xor") {
+  }
+  else if (mode == "xor")
+  {
     this->mode = QPainter::CompositionMode_Xor;
   }
 }
 
 void Layer::setAxis(const QString &axis)
 {
-  if(axis == "x") {
+  if (axis == "x")
+  {
     this->axis = Qt::XAxis;
-  } else if(axis == "y") {
+  }
+  else if (axis == "y")
+  {
     this->axis = Qt::YAxis;
-  } else if(axis == "z") {
+  }
+  else if (axis == "z")
+  {
     this->axis = Qt::ZAxis;
   }
 }
@@ -149,7 +189,6 @@ void Layer::setValue(const int &value)
   this->value = value;
 }
 
-
 void Layer::setDelta(const int &delta)
 {
   this->delta = delta;
@@ -182,9 +221,9 @@ void Layer::setSoftness(const int &softness)
 
 void Layer::setOpacity(const int &opacity)
 {
-  if(opacity > 100)
+  if (opacity > 100)
     this->opacity = 100;
-  if(opacity < 0)
+  if (opacity < 0)
     this->opacity = 0;
   this->opacity = opacity;
 }
@@ -207,17 +246,23 @@ void Layer::makeTransparent()
 
 void Layer::scale()
 {
-  if(mPixels != -1.0) {
+  if (mPixels != -1.0)
+  {
     double currentMPixels = canvas.width() * canvas.height() / 1000000.0;
     double scaleFactor = sqrt(mPixels / currentMPixels);
     canvas = canvas.scaledToWidth(canvas.width() * scaleFactor, Qt::SmoothTransformation);
     return;
   }
-  if(width == -1 && height != -1) {
+  if (width == -1 && height != -1)
+  {
     canvas = canvas.scaledToHeight(height, Qt::SmoothTransformation);
-  } else if(width != -1 && height == -1) {
+  }
+  else if (width != -1 && height == -1)
+  {
     canvas = canvas.scaledToWidth(width, Qt::SmoothTransformation);
-  } else if(width != -1 && height != -1) {
+  }
+  else if (width != -1 && height != -1)
+  {
     canvas = canvas.scaled(width, height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
   }
 }
@@ -235,7 +280,8 @@ void Layer::updateSize()
 
 bool Layer::hasLayers()
 {
-  if(layers.isEmpty()) {
+  if (layers.isEmpty())
+  {
     return false;
   }
   return true;
@@ -247,22 +293,26 @@ bool Layer::save(QString filename)
   const QRgb *canvasBits = (QRgb *)canvas.constBits();
   quint64 noOfPixels = canvas.width() * canvas.height();
   bool transparent = true;
-  for(quint64 a = 0; a < noOfPixels; a = a + 10) {
-    if(qAlpha(canvasBits[a]) != 0) {
+  for (quint64 a = 0; a < noOfPixels; a = a + 10)
+  {
+    if (qAlpha(canvasBits[a]) != 0)
+    {
       transparent = false;
       break;
     }
   }
-  if(transparent) {
+  if (transparent)
+  {
     return false;
   }
 
   canvas = canvas.convertToFormat(QImage::Format_ARGB6666_Premultiplied);
 
-  if(canvas.isNull())
+  if (canvas.isNull())
     return false;
 
-  if(canvas.save(filename)) {
+  if (canvas.save(filename))
+  {
     return true;
   }
   return false;
@@ -272,7 +322,7 @@ void Layer::colorFromHex(QString color)
 {
   color = color.replace("#", "");
 
-  if(color.length() != 6)
+  if (color.length() != 6)
     return;
 
   red = color.left(2).toInt(Q_NULLPTR, 16);

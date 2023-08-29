@@ -33,53 +33,69 @@ void GameEntry::calculateCompleteness(bool videoEnabled)
 {
   completeness = 100.0;
   int noOfTypes = 13;
-  if(videoEnabled) {
+  if (videoEnabled)
+  {
     noOfTypes += 1;
   }
   double valuePerType = completeness / (double)noOfTypes;
-  if(title.isEmpty()) {
+  if (title.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(platform.isEmpty()) {
+  if (platform.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(coverData.isNull()) {
+  if (coverData.isNull())
+  {
     completeness -= valuePerType;
   }
-  if(screenshotData.isNull()) {
+  if (screenshotData.isNull())
+  {
     completeness -= valuePerType;
   }
-  if(wheelData.isNull()) {
+  if (wheelData.isNull())
+  {
     completeness -= valuePerType;
   }
-  if(marqueeData.isNull()) {
+  if (marqueeData.isNull())
+  {
     completeness -= valuePerType;
   }
-  if(description.isEmpty()) {
+  if (description.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(releaseDate.isEmpty()) {
+  if (releaseDate.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(developer.isEmpty()) {
+  if (developer.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(publisher.isEmpty()) {
+  if (publisher.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(tags.isEmpty()) {
+  if (tags.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(rating.isEmpty()) {
+  if (rating.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(players.isEmpty()) {
+  if (players.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(ages.isEmpty()) {
+  if (ages.isEmpty())
+  {
     completeness -= valuePerType;
   }
-  if(videoEnabled && videoFormat.isEmpty()) {
+  if (videoEnabled && videoFormat.isEmpty())
+  {
     completeness -= valuePerType;
   }
 }

@@ -44,7 +44,8 @@ constexpr int TEXTURE = 14;
 
 #include <QImage>
 
-class GameEntry {
+class GameEntry
+{
 public:
   GameEntry();
   void calculateCompleteness(bool videoEnabled = false);
@@ -128,7 +129,7 @@ public:
   QString aMButtons = "";
 
   // Pegasus specific metadata for preservation
-  QList<QPair<QString, QString> > pSValuePairs;
+  QList<QPair<QString, QString>> pSValuePairs;
 
 private:
   double completeness = 0;

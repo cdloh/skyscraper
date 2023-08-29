@@ -38,15 +38,15 @@ QImage FxShadow::applyEffect(const QImage &src, const Layer &layer)
   int softness = layer.softness;
   int opacity = layer.opacity;
 
-  if(distance == -1)
+  if (distance == -1)
     distance = 5;
-  if(softness == -1)
+  if (softness == -1)
     softness = 5;
-  if(opacity == -1)
+  if (opacity == -1)
     opacity = 70;
 
   QImage buffer1(src.width() + softness * 2, src.height() + softness * 2,
-		 QImage::Format_ARGB32_Premultiplied);
+                 QImage::Format_ARGB32_Premultiplied);
   buffer1.fill(Qt::transparent);
   QPainter painter;
   painter.begin(&buffer1);
@@ -55,7 +55,8 @@ QImage FxShadow::applyEffect(const QImage &src, const Layer &layer)
 
   QRgb *buffer1Bits = (QRgb *)buffer1.bits();
   // Paint everything black but preserve alpha
-  for(int a = 0; a < buffer1.width() * buffer1.height(); ++a) {
+  for (int a = 0; a < buffer1.width() * buffer1.height(); ++a)
+  {
     buffer1Bits[a] = qPremultiply(qRgba(0, 0, 0, qAlpha(buffer1Bits[a])));
   }
 
@@ -67,8 +68,8 @@ QImage FxShadow::applyEffect(const QImage &src, const Layer &layer)
   boxBlur(buffer1Bits, buffer2Bits, width, height, softness);
 
   QImage resultImage(src.width() + distance + softness,
-		     src.height() + distance + softness,
-		     QImage::Format_ARGB32_Premultiplied);
+                     src.height() + distance + softness,
+                     QImage::Format_ARGB32_Premultiplied);
   resultImage.fill(Qt::transparent);
   painter.begin(&resultImage);
   painter.setOpacity(opacity * 0.01);
@@ -84,7 +85,8 @@ QVector<double> FxShadow::getGaussBoxes(double sigma, double n)
 {
   double wIdeal = sqrt((12.0 * sigma * sigma / n) + 1.0);
   double wl = floor(wIdeal);
-  if((int)wl % 2 == 0) {
+  if ((int)wl % 2 == 0)
+  {
     wl--;
   }
   double wu = wl + 2;
@@ -92,15 +94,17 @@ QVector<double> FxShadow::getGaussBoxes(double sigma, double n)
   int m = round(mIdeal);
 
   QVector<double> sizes;
-  for(int i = 0; i < n; i++) {
-    sizes.append(i < m?wl:wu);
+  for (int i = 0; i < n; i++)
+  {
+    sizes.append(i < m ? wl : wu);
   }
   return sizes;
 }
 
 void FxShadow::boxBlur(QRgb *buffer1, QRgb *buffer2, int width, int height, int radius)
 {
-  for(int i = 0; i < width * height; i++) {
+  for (int i = 0; i < width * height; i++)
+  {
     buffer2[i] = buffer1[i];
   }
   boxBlurHorizontal(buffer2, buffer1, width, height, radius);
@@ -110,25 +114,30 @@ void FxShadow::boxBlur(QRgb *buffer1, QRgb *buffer2, int width, int height, int 
 void FxShadow::boxBlurHorizontal(QRgb *buffer1, QRgb *buffer2, int width, int height, int radius)
 {
   int span = radius + radius + 1;
-  for(int y = 0; y < height; y++) {
+  for (int y = 0; y < height; y++)
+  {
     int currentIdx = y * width, frontIdx = currentIdx, backIdx = currentIdx + radius;
     int firstVal = qAlpha(buffer1[currentIdx]), lastVal = qAlpha(buffer1[currentIdx + width - 1]);
 
     // Initial 'value' fill at leftmost edge
     int value = (radius + 1) * firstVal;
-    for(int x = 0; x < radius; x++) {
+    for (int x = 0; x < radius; x++)
+    {
       value += qAlpha(buffer1[currentIdx + x]);
     }
-    
-    for(int x = 0; x <= radius ; x++) {
+
+    for (int x = 0; x <= radius; x++)
+    {
       value += qAlpha(buffer1[backIdx++]) - firstVal;
       buffer2[currentIdx++] = qPremultiply(qRgba(0, 0, 0, value / span));
     }
-    for(int x = radius + 1; x < width - radius; x++) {
+    for (int x = radius + 1; x < width - radius; x++)
+    {
       value += qAlpha(buffer1[backIdx++]) - qAlpha(buffer1[frontIdx++]);
       buffer2[currentIdx++] = qPremultiply(qRgba(0, 0, 0, value / span));
     }
-    for(int x = width- radius; x < width; x++) {
+    for (int x = width - radius; x < width; x++)
+    {
       value += lastVal - qAlpha(buffer1[frontIdx++]);
       buffer2[currentIdx++] = qPremultiply(qRgba(0, 0, 0, value / span));
     }
@@ -138,31 +147,36 @@ void FxShadow::boxBlurHorizontal(QRgb *buffer1, QRgb *buffer2, int width, int he
 void FxShadow::boxBlurTotal(QRgb *buffer1, QRgb *buffer2, int width, int height, int radius)
 {
   int span = radius + radius + 1;
-  for(int x = 0; x < width; x++) {
+  for (int x = 0; x < width; x++)
+  {
     int currentIdx = x, frontIdx = currentIdx, backIdx = currentIdx + radius * width;
     int firstVal = qAlpha(buffer1[currentIdx]),
-      lastVal = qAlpha(buffer1[currentIdx + width * (height - 1)]);
+        lastVal = qAlpha(buffer1[currentIdx + width * (height - 1)]);
 
     // Initial 'value' fill at topmost edge
     int value = (radius + 1) * firstVal;
-    for(int y = 0; y < radius; y++) {
+    for (int y = 0; y < radius; y++)
+    {
       value += qAlpha(buffer1[currentIdx + y * width]);
     }
-    
-    for(int y = 0; y <= radius ; y++) {
+
+    for (int y = 0; y <= radius; y++)
+    {
       value += qAlpha(buffer1[backIdx]) - firstVal;
       buffer2[currentIdx] = qPremultiply(qRgba(0, 0, 0, value / span));
       backIdx += width;
       currentIdx += width;
     }
-    for(int y = radius + 1; y < height - radius; y++) {
+    for (int y = radius + 1; y < height - radius; y++)
+    {
       value += qAlpha(buffer1[backIdx]) - qAlpha(buffer1[frontIdx]);
       buffer2[currentIdx] = qPremultiply(qRgba(0, 0, 0, value / span));
       frontIdx += width;
       backIdx += width;
       currentIdx += width;
     }
-    for(int y = height - radius; y < height; y++) {
+    for (int y = height - radius; y < height; y++)
+    {
       value += lastVal - qAlpha(buffer1[frontIdx]);
       buffer2[currentIdx] = qPremultiply(qRgba(0, 0, 0, value / span));
       frontIdx += width;

@@ -42,8 +42,10 @@ bool XmlReader::setFile(QString filename)
   bool result = false;
 
   QFile f(filename);
-  if(f.open(QIODevice::ReadOnly)) {
-    if(setContent(f.readAll(), false)) {
+  if (f.open(QIODevice::ReadOnly))
+  {
+    if (setContent(f.readAll(), false))
+    {
       result = true;
     }
     f.close();
@@ -65,9 +67,10 @@ QList<GameEntry> XmlReader::getEntries(QString inputFolder)
 }
 
 void XmlReader::addEntries(const QDomNodeList &nodes, QList<GameEntry> &gameEntries,
-			   const QString &inputFolder)
+                           const QString &inputFolder)
 {
-  for(int a = 0; a < nodes.length(); ++a) {
+  for (int a = 0; a < nodes.length(); ++a)
+  {
     GameEntry entry;
     entry.path = makeAbsolute(nodes.at(a).firstChildElement("path").text(), inputFolder);
     // Do NOT get sqr and par notes here. They are not used by skipExisting
@@ -77,7 +80,8 @@ void XmlReader::addEntries(const QDomNodeList &nodes, QList<GameEntry> &gameEntr
     entry.marqueeFile = makeAbsolute(nodes.at(a).firstChildElement("marquee").text(), inputFolder);
     entry.textureFile = makeAbsolute(nodes.at(a).firstChildElement("texture").text(), inputFolder);
     entry.videoFile = makeAbsolute(nodes.at(a).firstChildElement("video").text(), inputFolder);
-    if(!entry.videoFile.isEmpty()) {
+    if (!entry.videoFile.isEmpty())
+    {
       entry.videoFormat = "fromxml";
     }
     entry.description = nodes.at(a).firstChildElement("desc").text();
@@ -99,7 +103,8 @@ void XmlReader::addEntries(const QDomNodeList &nodes, QList<GameEntry> &gameEntr
 
 QString XmlReader::makeAbsolute(QString filePath, const QString &inputFolder)
 {
-  if(filePath.left(1) == ".") {
+  if (filePath.left(1) == ".")
+  {
     filePath.remove(0, 1);
     filePath.prepend(inputFolder);
   }

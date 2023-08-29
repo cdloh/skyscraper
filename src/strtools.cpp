@@ -31,63 +31,11 @@
 
 QString StrTools::xmlUnescape(QString str)
 {
-  str = str.replace("&amp;", "&").
-    replace("&lt;", "<").
-    replace("&gt;", ">").
-    replace("&quot;", "\"").
-    replace("&apos;", "'").
-    replace("&copy;", "(c)").
-    replace("&#32;", " ").
-    replace("&#33;", "!").
-    replace("&#34;", "\"").
-    replace("&#35;", "#").
-    replace("&#36;", "$").
-    replace("&#37;", "%").
-    replace("&#38;", "&").
-    replace("&#39;", "'").
-    replace("&#40;", "(").
-    replace("&#41;", ")").
-    replace("&#42;", "*").
-    replace("&#43;", "+").
-    replace("&#44;", ",").
-    replace("&#45;", "-").
-    replace("&#46;", ".").
-    replace("&#47;", "/").
-    replace("&#032;", " ").
-    replace("&#033;", "!").
-    replace("&#034;", "\"").
-    replace("&#035;", "#").
-    replace("&#036;", "$").
-    replace("&#037;", "%").
-    replace("&#038;", "&").
-    replace("&#039;", "'").
-    replace("&#040;", "(").
-    replace("&#041;", ")").
-    replace("&#042;", "*").
-    replace("&#043;", "+").
-    replace("&#044;", ",").
-    replace("&#045;", "-").
-    replace("&#046;", ".").
-    replace("&#047;", "/").
-    replace("&#160;", " ").
-    replace("&#179;", "3").
-    replace("&#8211;", "-").
-    replace("&#8217;", "'").
-    replace("&#xF4;", "o").
-    replace("&#xE3;", "a").
-    replace("&#xE4;", "ae").
-    replace("&#xE1;", "a").
-    replace("&#xE9;", "e").
-    replace("&#xED;", "i").
-    replace("&#x16B;", "uu").
-    replace("&#x22;", "\"").
-    replace("&#x26;", "&").
-    replace("&#x27;", "'").
-    replace("&#xB3;", "3").
-    replace("&#x14D;", "o");
+  str = str.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"").replace("&apos;", "'").replace("&copy;", "(c)").replace("&#32;", " ").replace("&#33;", "!").replace("&#34;", "\"").replace("&#35;", "#").replace("&#36;", "$").replace("&#37;", "%").replace("&#38;", "&").replace("&#39;", "'").replace("&#40;", "(").replace("&#41;", ")").replace("&#42;", "*").replace("&#43;", "+").replace("&#44;", ",").replace("&#45;", "-").replace("&#46;", ".").replace("&#47;", "/").replace("&#032;", " ").replace("&#033;", "!").replace("&#034;", "\"").replace("&#035;", "#").replace("&#036;", "$").replace("&#037;", "%").replace("&#038;", "&").replace("&#039;", "'").replace("&#040;", "(").replace("&#041;", ")").replace("&#042;", "*").replace("&#043;", "+").replace("&#044;", ",").replace("&#045;", "-").replace("&#046;", ".").replace("&#047;", "/").replace("&#160;", " ").replace("&#179;", "3").replace("&#8211;", "-").replace("&#8217;", "'").replace("&#xF4;", "o").replace("&#xE3;", "a").replace("&#xE4;", "ae").replace("&#xE1;", "a").replace("&#xE9;", "e").replace("&#xED;", "i").replace("&#x16B;", "uu").replace("&#x22;", "\"").replace("&#x26;", "&").replace("&#x27;", "'").replace("&#xB3;", "3").replace("&#x14D;", "o");
 
-  while(str.contains("&") && str.contains(";") && str.indexOf("&") < str.indexOf(";") &&
-	str.indexOf(";") - str.indexOf("&") <= 10) {
+  while (str.contains("&") && str.contains(";") && str.indexOf("&") < str.indexOf(";") &&
+         str.indexOf(";") - str.indexOf("&") <= 10)
+  {
     str = str.remove(str.indexOf("&"), str.indexOf(";") + 1 - str.indexOf("&"));
   }
 
@@ -98,12 +46,7 @@ QString StrTools::xmlEscape(QString str)
 {
   str = xmlUnescape(str);
 
-  return str.
-    replace("&", "&amp;").
-    replace("<", "&lt;").
-    replace(">", "&gt;").
-    replace("\"", "&quot;").
-    replace("'", "&apos;");
+  return str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&apos;");
 }
 
 QByteArray StrTools::magic(const QByteArray str)
@@ -113,22 +56,25 @@ QByteArray StrTools::magic(const QByteArray str)
   int strChars[str.length()];
   int magicChars[str.length()];
 
-  for(int a = 0; a < str.length(); ++a) {
+  for (int a = 0; a < str.length(); ++a)
+  {
     strChars[a] = str.at(a);
   }
 
-  for(int a = 0; a < str.length(); ++a) {
+  for (int a = 0; a < str.length(); ++a)
+  {
     magicChars[a] = magicStr.at(a);
   }
 
   QByteArray thingie;
-  for(int a = 0; a < str.length(); ++a) {
+  for (int a = 0; a < str.length(); ++a)
+  {
     thingie.append(QString::number(strChars[a] += magicChars[a]).toUtf8() + ";");
   }
 
   thingie = thingie.left(thingie.length() - 1);
 
-  return thingie; 
+  return thingie;
 }
 
 QByteArray StrTools::unMagic(const QByteArray str)
@@ -140,60 +86,63 @@ QByteArray StrTools::unMagic(const QByteArray str)
   int strChars[length];
   int magicChars[length];
 
-  for(int a = 0; a < length; ++a) {
+  for (int a = 0; a < length; ++a)
+  {
     strChars[a] = str.split(';').at(a).toInt();
   }
-  for(int a = 0; a < length; ++a) {
+  for (int a = 0; a < length; ++a)
+  {
     magicChars[a] = magicStr.at(a);
   }
   QByteArray thingie;
-  for(int a = 0; a < length; ++a) {
+  for (int a = 0; a < length; ++a)
+  {
     thingie.append(QString(QChar(strChars[a] -= magicChars[a])).toUtf8());
   }
 
-  return thingie; 
+  return thingie;
 }
 
 QString StrTools::conformPlayers(const QString str)
 {
-  if(QRegularExpression("^1 Player").match(str).hasMatch())
+  if (QRegularExpression("^1 Player").match(str).hasMatch())
     return "1";
 
-  if(QRegularExpression("^1 Only").match(str).hasMatch())
+  if (QRegularExpression("^1 Only").match(str).hasMatch())
     return "1";
 
-  if(QRegularExpression("^single player").match(str).hasMatch())
+  if (QRegularExpression("^single player").match(str).hasMatch())
     return "1";
 
-  if(QRegularExpression("^1 or 2").match(str).hasMatch())
+  if (QRegularExpression("^1 or 2").match(str).hasMatch())
     return "2";
 
-  if(QRegularExpression("^\\d-\\d\\d").match(str).hasMatch())
+  if (QRegularExpression("^\\d-\\d\\d").match(str).hasMatch())
     return str.mid(2, 2);
 
-  if(QRegularExpression("^\\d-\\d").match(str).hasMatch())
+  if (QRegularExpression("^\\d-\\d").match(str).hasMatch())
     return str.mid(2, 1);
 
-  if(QRegularExpression("^\\d - \\d\\d").match(str).hasMatch())
+  if (QRegularExpression("^\\d - \\d\\d").match(str).hasMatch())
     return str.mid(4, 2);
 
-  if(QRegularExpression("^\\d - \\d").match(str).hasMatch())
+  if (QRegularExpression("^\\d - \\d").match(str).hasMatch())
     return str.mid(4, 1);
 
   // A faulty Openretro entry is necessary as it marks "1 - 6" as "1 -6"
-  if(QRegularExpression("^\\d -\\d\\d").match(str).hasMatch())
+  if (QRegularExpression("^\\d -\\d\\d").match(str).hasMatch())
     return str.mid(3, 2);
 
-  if(QRegularExpression("^\\d -\\d").match(str).hasMatch())
+  if (QRegularExpression("^\\d -\\d").match(str).hasMatch())
     return str.mid(3, 1);
 
-  if(QRegularExpression("^\\d to \\d\\d").match(str).hasMatch())
+  if (QRegularExpression("^\\d to \\d\\d").match(str).hasMatch())
     return str.mid(5, 2);
 
-  if(QRegularExpression("^\\d to \\d").match(str).hasMatch())
+  if (QRegularExpression("^\\d to \\d").match(str).hasMatch())
     return str.mid(5, 1);
 
-  if(QRegularExpression("^\\d\\+").match(str).hasMatch())
+  if (QRegularExpression("^\\d\\+").match(str).hasMatch())
     return str.mid(0, 1);
 
   return str;
@@ -201,83 +150,160 @@ QString StrTools::conformPlayers(const QString str)
 
 QString StrTools::conformAges(QString str)
 {
-  if(str == "0 (ohne Altersbeschränkung)") {
+  if (str == "0 (ohne Altersbeschränkung)")
+  {
     str = "1";
-  } else if(str == "U") {
+  }
+  else if (str == "U")
+  {
     str = "1";
-  } else if(str == "E") {
+  }
+  else if (str == "E")
+  {
     str = "1";
-  } else if(str == "E - Everyone") {
+  }
+  else if (str == "E - Everyone")
+  {
     str = "1";
-  } else if(str == "Everyone") {
+  }
+  else if (str == "Everyone")
+  {
     str = "1";
-  } else if(str == "GA") {
+  }
+  else if (str == "GA")
+  {
     str = "1";
-  } else if(str == "EC") {
+  }
+  else if (str == "EC")
+  {
     str = "3";
-  } else if(str == "Early Childhood") {
+  }
+  else if (str == "Early Childhood")
+  {
     str = "3";
-  } else if(str == "3+") {
+  }
+  else if (str == "3+")
+  {
     str = "3";
-  } else if(str == "G") {
+  }
+  else if (str == "G")
+  {
     str = "3";
-  } else if(str == "KA") {
+  }
+  else if (str == "KA")
+  {
     str = "6";
-  } else if(str == "Kids to Adults") {
+  }
+  else if (str == "Kids to Adults")
+  {
     str = "6";
-  } else if(str == "G8+") {
+  }
+  else if (str == "G8+")
+  {
     str = "8";
-  } else if(str == "E10+") {
+  }
+  else if (str == "E10+")
+  {
     str = "10";
-  } else if(str == "E10+ - Everyone 10+") {
+  }
+  else if (str == "E10+ - Everyone 10+")
+  {
     str = "10";
-  } else if(str == "Everyone 10+") {
+  }
+  else if (str == "Everyone 10+")
+  {
     str = "10";
-  } else if(str == "11+") {
+  }
+  else if (str == "11+")
+  {
     str = "11";
-  } else if(str == "12+") {
+  }
+  else if (str == "12+")
+  {
     str = "11";
-  } else if(str == "MA-13") {
+  }
+  else if (str == "MA-13")
+  {
     str = "13";
-  } else if(str == "T") {
+  }
+  else if (str == "T")
+  {
     str = "13";
-  } else if(str == "T - Teen") {
+  }
+  else if (str == "T - Teen")
+  {
     str = "13";
-  } else if(str == "Teen") {
+  }
+  else if (str == "Teen")
+  {
     str = "13";
-  } else if(str == "M") {
+  }
+  else if (str == "M")
+  {
     str = "15";
-  } else if(str == "M15+") {
+  }
+  else if (str == "M15+")
+  {
     str = "15";
-  } else if(str == "MA 15+") {
+  }
+  else if (str == "MA 15+")
+  {
     str = "15";
-  } else if(str == "MA15+") {
+  }
+  else if (str == "MA15+")
+  {
     str = "15";
-  } else if(str == "PG") {
+  }
+  else if (str == "PG")
+  {
     str = "15";
-  } else if(str == "15+") {
+  }
+  else if (str == "15+")
+  {
     str = "15";
-  } else if(str == "MA-17") {
+  }
+  else if (str == "MA-17")
+  {
     str = "17";
-  } else if(str == "M") {
+  }
+  else if (str == "M")
+  {
     str = "17";
-  } else if(str == "18+") {
+  }
+  else if (str == "18+")
+  {
     str = "18";
-  } else if(str == "R18+") {
+  }
+  else if (str == "R18+")
+  {
     str = "18";
-  } else if(str == "18 (keine Jugendfreigabe)") {
+  }
+  else if (str == "18 (keine Jugendfreigabe)")
+  {
     str = "18";
-  } else if(str == "A") {
+  }
+  else if (str == "A")
+  {
     str = "18";
-  } else if(str == "AO") {
+  }
+  else if (str == "AO")
+  {
     str = "18";
-  } else if(str == "AO - Adults Only") {
+  }
+  else if (str == "AO - Adults Only")
+  {
     str = "18";
-  } else if(str == "Adults Only") {
+  }
+  else if (str == "Adults Only")
+  {
     str = "18";
-  } else if(str == "M - Mature") {
+  }
+  else if (str == "M - Mature")
+  {
     str = "18";
-  } else if(str == "Mature") {
+  }
+  else if (str == "Mature")
+  {
     str = "18";
   }
 
@@ -286,21 +312,36 @@ QString StrTools::conformAges(QString str)
 
 QString StrTools::conformReleaseDate(QString str)
 {
-  if(QRegularExpression("^\\d{4}$").match(str).hasMatch()) {
+  if (QRegularExpression("^\\d{4}$").match(str).hasMatch())
+  {
     str = QDate::fromString(str, "yyyy").toString("yyyyMMdd");
-  } else if(QRegularExpression("^\\d{4}-[0-1]{1}\\d{1}$").match(str).hasMatch()) {
+  }
+  else if (QRegularExpression("^\\d{4}-[0-1]{1}\\d{1}$").match(str).hasMatch())
+  {
     str = QDate::fromString(str, "yyyy-MM").toString("yyyyMMdd");
-  } else if(QRegularExpression("^\\d{4}-[0-1]{1}\\d{1}-[0-3]{1}\\d{1}$").match(str).hasMatch()) {
+  }
+  else if (QRegularExpression("^\\d{4}-[0-1]{1}\\d{1}-[0-3]{1}\\d{1}$").match(str).hasMatch())
+  {
     str = QDate::fromString(str, "yyyy-MM-dd").toString("yyyyMMdd");
-  } else if(QRegularExpression("^[0-1]{1}\\d{1}/[0-3]{1}\\d{1}/\\d{4}$").match(str).hasMatch()) {
+  }
+  else if (QRegularExpression("^[0-1]{1}\\d{1}/[0-3]{1}\\d{1}/\\d{4}$").match(str).hasMatch())
+  {
     str = QDate::fromString(str, "MM/dd/yyyy").toString("yyyyMMdd");
-  } else if(QRegularExpression("^\\d{4}-[a-zA-Z]{3}-[0-3]{1}\\d{1}$").match(str).hasMatch()) {
+  }
+  else if (QRegularExpression("^\\d{4}-[a-zA-Z]{3}-[0-3]{1}\\d{1}$").match(str).hasMatch())
+  {
     str = QDate::fromString(str, "yyyy-MMM-dd").toString("yyyyMMdd");
-  } else if(QRegularExpression("^[a-zA-z]{3}, \\d{4}$").match(str).hasMatch()) {
+  }
+  else if (QRegularExpression("^[a-zA-z]{3}, \\d{4}$").match(str).hasMatch())
+  {
     str = QDate::fromString(str, "MMM, yyyy").toString("yyyyMMdd");
-  } else if(QRegularExpression("^[a-zA-z]{3} [0-3]{1}\\d{1}, \\d{4}$").match(str).hasMatch()) {
+  }
+  else if (QRegularExpression("^[a-zA-z]{3} [0-3]{1}\\d{1}, \\d{4}$").match(str).hasMatch())
+  {
     str = QDate::fromString(str, "MMM dd, yyyy").toString("yyyyMMdd");
-  } else if(QRegularExpression("^[12]{1}[019]{1}[0-9]{2}[0-1]{1}[0-9]{1}[0-3]{1}[0-9]{1}T[0-9]{6}$").match(str).hasMatch()) {
+  }
+  else if (QRegularExpression("^[12]{1}[019]{1}[0-9]{2}[0-1]{1}[0-9]{1}[0-3]{1}[0-9]{1}T[0-9]{6}$").match(str).hasMatch())
+  {
     str = str.left(8);
   }
   return str;
@@ -314,7 +355,8 @@ QString StrTools::conformTags(const QString str)
 #else
   QList<QString> tagList = str.split(',', QString::SkipEmptyParts);
 #endif
-  for(auto &tag: tagList) {
+  for (auto &tag : tagList)
+  {
     tag = tag.simplified();
     tag = tag.left(1).toUpper() + tag.mid(1, tag.length() - 1);
     tags += tag.simplified() + ", ";
@@ -327,7 +369,8 @@ QString StrTools::getVersionHeader()
 {
   QString headerString = "Running Skyscraper v" VERSION " by Lars Muldjord";
   QString dashesString = "";
-  for(int a = 0; a < headerString.length(); ++a) {
+  for (int a = 0; a < headerString.length(); ++a)
+  {
     dashesString += "-";
   }
 
@@ -341,7 +384,8 @@ QString StrTools::stripBrackets(const QString str)
 
 QString StrTools::stripHtmlTags(QString str)
 {
-  while(str.contains("<") && str.contains(">") && str.indexOf("<") < str.indexOf(">")) {
+  while (str.contains("<") && str.contains(">") && str.indexOf("<") < str.indexOf(">"))
+  {
     str = str.remove(str.indexOf("<"), str.indexOf(">") + 1 - str.indexOf("<"));
   }
   return str;

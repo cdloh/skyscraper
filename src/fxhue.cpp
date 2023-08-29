@@ -38,16 +38,19 @@ QImage FxHue::applyEffect(const QImage &src, const Layer &layer)
 
   int hue = layer.delta;
 
-  if(hue > 359 || hue < 0) {
+  if (hue > 359 || hue < 0)
+  {
     return canvas;
   }
 
-  for(int y = 0; y < canvas.height(); ++y) {
-    QRgb* line = (QRgb *)canvas.scanLine(y);
-    for(int x = 0; x < canvas.width(); ++x) {
+  for (int y = 0; y < canvas.height(); ++y)
+  {
+    QRgb *line = (QRgb *)canvas.scanLine(y);
+    for (int x = 0; x < canvas.width(); ++x)
+    {
       QColor color(line[x]);
       color.setHsv(color.hue() + hue, color.saturation(), color.value(),
-		   qAlpha(line[x]));
+                   qAlpha(line[x]));
       line[x] = qPremultiply(color.rgba());
     }
   }

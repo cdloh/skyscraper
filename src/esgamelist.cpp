@@ -29,18 +29,20 @@
 #include <QDir>
 
 ESGameList::ESGameList(Settings *config,
-		       QSharedPointer<NetManager> manager)
-  : AbstractScraper(config, manager)
+                       QSharedPointer<NetManager> manager)
+    : AbstractScraper(config, manager)
 {
-  baseUrl = config->gameListFolder + (config->gameListFolder.right(1) != "/"?"/":"");
+  baseUrl = config->gameListFolder + (config->gameListFolder.right(1) != "/" ? "/" : "");
   QString gameListXml = baseUrl + "gamelist.xml";
-  if(!QFileInfo::exists(gameListXml)) {
+  if (!QFileInfo::exists(gameListXml))
+  {
     baseUrl = "import/" + config->platform + "/";
     gameListXml = baseUrl + "gamelist.xml";
   }
   QDomDocument xmlDoc;
   QFile gameListFile(gameListXml);
-  if(gameListFile.open(QIODevice::ReadOnly)) {
+  if (gameListFile.open(QIODevice::ReadOnly))
+  {
     xmlDoc.setContent(&gameListFile);
     gameListFile.close();
     games = xmlDoc.elementsByTagName("game");
@@ -48,16 +50,19 @@ ESGameList::ESGameList(Settings *config,
 }
 
 void ESGameList::getSearchResults(QList<GameEntry> &gameEntries,
-				  QString searchName, QString platform) {
-  if(games.isEmpty())
+                                  QString searchName, QString platform)
+{
+  if (games.isEmpty())
     return;
 
   gameNode.clear();
 
-  for(int i = 0; i < games.size(); ++i) {
+  for (int i = 0; i < games.size(); ++i)
+  {
     // Find <game> where last part of <path> matches file name
     QFileInfo info(games.item(i).firstChildElement("path").text());
-    if(info.fileName() == searchName) {
+    if (info.fileName() == searchName)
+    {
       gameNode = games.item(i);
       GameEntry game;
       game.title = gameNode.firstChildElement("name").text();
@@ -68,8 +73,9 @@ void ESGameList::getSearchResults(QList<GameEntry> &gameEntries,
   }
 }
 
-void ESGameList::getGameData(GameEntry &game) {
-  if(gameNode.isNull())
+void ESGameList::getGameData(GameEntry &game)
+{
+  if (gameNode.isNull())
     return;
 
   game.releaseDate = gameNode.firstChildElement("releasedate").text();
@@ -82,14 +88,17 @@ void ESGameList::getGameData(GameEntry &game) {
   game.marqueeData = loadImageData(gameNode.firstChildElement("marquee").text());
   game.coverData = loadImageData(gameNode.firstChildElement("thumbnail").text());
   game.screenshotData = loadImageData(gameNode.firstChildElement("image").text());
-  if(config->videos) {
+  if (config->videos)
+  {
     loadVideoData(game, gameNode.firstChildElement("video").text());
   }
 }
 
-QByteArray ESGameList::loadImageData(const QString fileName) {
+QByteArray ESGameList::loadImageData(const QString fileName)
+{
   QFile imageFile(getAbsoluteFileName(fileName));
-  if(imageFile.open(QIODevice::ReadOnly)) {
+  if (imageFile.open(QIODevice::ReadOnly))
+  {
     QByteArray imageData = imageFile.readAll();
     imageFile.close();
     return imageData;
@@ -97,33 +106,40 @@ QByteArray ESGameList::loadImageData(const QString fileName) {
   return QByteArray();
 }
 
-void ESGameList::loadVideoData(GameEntry &game, const QString fileName) {
+void ESGameList::loadVideoData(GameEntry &game, const QString fileName)
+{
   QString absoluteFileName = getAbsoluteFileName(fileName);
-  if(absoluteFileName.isEmpty())
+  if (absoluteFileName.isEmpty())
     return;
 
   QFile videoFile(absoluteFileName);
-  if(videoFile.open(QIODevice::ReadOnly)) {
+  if (videoFile.open(QIODevice::ReadOnly))
+  {
     game.videoData = videoFile.readAll();
-    if(game.videoData.size() > 4096) {
+    if (game.videoData.size() > 4096)
+    {
       game.videoFormat = QFileInfo(absoluteFileName).suffix();
     }
     videoFile.close();
   }
 }
 
-QString ESGameList::getAbsoluteFileName(QString fileName) {
-  if(QFileInfo::exists(fileName)) {
+QString ESGameList::getAbsoluteFileName(QString fileName)
+{
+  if (QFileInfo::exists(fileName))
+  {
     return QFileInfo(fileName).absoluteFilePath();
   }
   fileName.prepend(baseUrl);
-  if(QFileInfo::exists(fileName)) {
+  if (QFileInfo::exists(fileName))
+  {
     return QFileInfo(fileName).absoluteFilePath();
   }
   return "";
 }
 
-QList<QString> ESGameList::getSearchNames(const QFileInfo &info) {
+QList<QString> ESGameList::getSearchNames(const QFileInfo &info)
+{
   QList<QString> searchNames;
   searchNames.append(info.fileName());
   return searchNames;

@@ -28,8 +28,8 @@
 #include "importscraper.h"
 
 ImportScraper::ImportScraper(Settings *config,
-			     QSharedPointer<NetManager> manager)
-  : AbstractScraper(config, manager)
+                             QSharedPointer<NetManager> manager)
+    : AbstractScraper(config, manager)
 {
   fetchOrder.append(TITLE);
   fetchOrder.append(DEVELOPER);
@@ -48,19 +48,26 @@ ImportScraper::ImportScraper(Settings *config,
   fetchOrder.append(DESCRIPTION);
 
   covers = QDir(config->importFolder + "/covers", "*.*",
-		QDir::Name, QDir::Files | QDir::NoDotAndDotDot).entryInfoList();
+                QDir::Name, QDir::Files | QDir::NoDotAndDotDot)
+               .entryInfoList();
   screenshots = QDir(config->importFolder + "/screenshots", "*.*",
-	       QDir::Name, QDir::Files | QDir::NoDotAndDotDot).entryInfoList();
+                     QDir::Name, QDir::Files | QDir::NoDotAndDotDot)
+                    .entryInfoList();
   wheels = QDir(config->importFolder + "/wheels", "*.*",
-		QDir::Name, QDir::Files | QDir::NoDotAndDotDot).entryInfoList();
+                QDir::Name, QDir::Files | QDir::NoDotAndDotDot)
+               .entryInfoList();
   marquees = QDir(config->importFolder + "/marquees", "*.*",
-		  QDir::Name, QDir::Files | QDir::NoDotAndDotDot).entryInfoList();
+                  QDir::Name, QDir::Files | QDir::NoDotAndDotDot)
+                 .entryInfoList();
   textures = QDir(config->importFolder + "/textures", "*.*",
-                  QDir::Name, QDir::Files | QDir::NoDotAndDotDot).entryInfoList();
+                  QDir::Name, QDir::Files | QDir::NoDotAndDotDot)
+                 .entryInfoList();
   videos = QDir(config->importFolder + "/videos", "*.*",
-		QDir::Name, QDir::Files | QDir::NoDotAndDotDot).entryInfoList();
+                QDir::Name, QDir::Files | QDir::NoDotAndDotDot)
+               .entryInfoList();
   textual = QDir(config->importFolder + "/textual", "*.*",
-		 QDir::Name, QDir::Files | QDir::NoDotAndDotDot).entryInfoList();
+                 QDir::Name, QDir::Files | QDir::NoDotAndDotDot)
+                .entryInfoList();
   loadDefinitions();
 }
 
@@ -72,8 +79,10 @@ void ImportScraper::getGameData(GameEntry &game)
   loadData();
 
   QByteArray dataOrig = data;
-  for(int a = 0; a < fetchOrder.length(); ++a) {
-    switch(fetchOrder.at(a)) {
+  for (int a = 0; a < fetchOrder.length(); ++a)
+  {
+    switch (fetchOrder.at(a))
+    {
     case TITLE:
       getTitle(game);
       data = dataOrig;
@@ -126,12 +135,12 @@ void ImportScraper::getGameData(GameEntry &game)
       getTexture(game);
       break;
     case VIDEO:
-      if(config->videos) {
-	getVideo(game);
+      if (config->videos)
+      {
+        getVideo(game);
       }
       break;
-    default:
-      ;
+    default:;
     }
   }
 }
@@ -153,7 +162,8 @@ void ImportScraper::runPasses(QList<GameEntry> &gameEntries, const QFileInfo &in
   bool marqueeFound = checkType(info.completeBaseName(), marquees, marqueeFile);
   bool textureFound = checkType(info.completeBaseName(), textures, textureFile);
   bool videoFound = checkType(info.completeBaseName(), videos, videoFile);
-  if(textualFound || screenshotFound || coverFound || wheelFound || marqueeFound || textureFound || videoFound) {
+  if (textualFound || screenshotFound || coverFound || wheelFound || marqueeFound || textureFound || videoFound)
+  {
     game.title = info.completeBaseName();
     game.platform = config->platform;
     gameEntries.append(game);
@@ -167,9 +177,11 @@ QString ImportScraper::getCompareTitle(QFileInfo info)
 
 void ImportScraper::getCover(GameEntry &game)
 {
-  if(!coverFile.isEmpty()) {
+  if (!coverFile.isEmpty())
+  {
     QFile f(coverFile);
-    if(f.open(QIODevice::ReadOnly)) {
+    if (f.open(QIODevice::ReadOnly))
+    {
       game.coverData = f.readAll();
       f.close();
     }
@@ -178,9 +190,11 @@ void ImportScraper::getCover(GameEntry &game)
 
 void ImportScraper::getScreenshot(GameEntry &game)
 {
-  if(!screenshotFile.isEmpty()) {
+  if (!screenshotFile.isEmpty())
+  {
     QFile f(screenshotFile);
-    if(f.open(QIODevice::ReadOnly)) {
+    if (f.open(QIODevice::ReadOnly))
+    {
       game.screenshotData = f.readAll();
       f.close();
     }
@@ -189,9 +203,11 @@ void ImportScraper::getScreenshot(GameEntry &game)
 
 void ImportScraper::getWheel(GameEntry &game)
 {
-  if(!wheelFile.isEmpty()) {
+  if (!wheelFile.isEmpty())
+  {
     QFile f(wheelFile);
-    if(f.open(QIODevice::ReadOnly)) {
+    if (f.open(QIODevice::ReadOnly))
+    {
       game.wheelData = f.readAll();
       f.close();
     }
@@ -200,19 +216,24 @@ void ImportScraper::getWheel(GameEntry &game)
 
 void ImportScraper::getMarquee(GameEntry &game)
 {
-  if(!marqueeFile.isEmpty()) {
+  if (!marqueeFile.isEmpty())
+  {
     QFile f(marqueeFile);
-    if(f.open(QIODevice::ReadOnly)) {
+    if (f.open(QIODevice::ReadOnly))
+    {
       game.marqueeData = f.readAll();
       f.close();
     }
   }
 }
 
-void ImportScraper::getTexture(GameEntry &game) {
-  if (!textureFile.isEmpty()) {
+void ImportScraper::getTexture(GameEntry &game)
+{
+  if (!textureFile.isEmpty())
+  {
     QFile f(textureFile);
-    if (f.open(QIODevice::ReadOnly)) {
+    if (f.open(QIODevice::ReadOnly))
+    {
       game.textureData = f.readAll();
       f.close();
     }
@@ -221,9 +242,11 @@ void ImportScraper::getTexture(GameEntry &game) {
 
 void ImportScraper::getVideo(GameEntry &game)
 {
-  if(!videoFile.isEmpty()) {
+  if (!videoFile.isEmpty())
+  {
     QFile f(videoFile);
-    if(f.open(QIODevice::ReadOnly)) {
+    if (f.open(QIODevice::ReadOnly))
+    {
       QFileInfo i(videoFile);
       game.videoData = f.readAll();
       game.videoFormat = i.suffix();
@@ -234,15 +257,19 @@ void ImportScraper::getVideo(GameEntry &game)
 
 void ImportScraper::getTitle(GameEntry &game)
 {
-  if(titlePre.isEmpty()) {
+  if (titlePre.isEmpty())
+  {
     return;
   }
-  for(const auto &nom: titlePre) {
-    if(!checkNom(nom)) {
+  for (const auto &nom : titlePre)
+  {
+    if (!checkNom(nom))
+    {
       return;
     }
   }
-  for(const auto &nom: titlePre) {
+  for (const auto &nom : titlePre)
+  {
     nomNom(nom);
   }
   game.title = data.left(data.indexOf(titlePost.toUtf8())).simplified();
@@ -250,9 +277,11 @@ void ImportScraper::getTitle(GameEntry &game)
 
 void ImportScraper::loadData()
 {
-  if(!textualFile.isEmpty()) {
+  if (!textualFile.isEmpty())
+  {
     QFile f(textualFile);
-    if(f.open(QIODevice::ReadOnly)) {
+    if (f.open(QIODevice::ReadOnly))
+    {
       data = f.readAll();
       f.close();
     }
@@ -263,13 +292,18 @@ bool ImportScraper::loadDefinitions()
 {
   // Check for textual resource file
   QFile defFile;
-  if(QFile::exists(config->importFolder + "/definitions.dat")) {
+  if (QFile::exists(config->importFolder + "/definitions.dat"))
+  {
     defFile.setFileName(config->importFolder + "/definitions.dat");
-  } else {
+  }
+  else
+  {
     defFile.setFileName(config->importFolder + "/../definitions.dat");
   }
-  if(defFile.open(QIODevice::ReadOnly)) {
-    while(!defFile.atEnd()) {
+  if (defFile.open(QIODevice::ReadOnly))
+  {
+    while (!defFile.atEnd())
+    {
       QString line(defFile.readLine());
       checkForTag(titlePre, titlePost, titleTag, line);
       checkForTag(publisherPre, publisherPost, publisherTag, line);
@@ -289,7 +323,8 @@ bool ImportScraper::loadDefinitions()
 
 void ImportScraper::checkForTag(QList<QString> &pre, QString &post, QString &tag, QString &line)
 {
-  if(line.indexOf(tag) != -1 && line.indexOf(tag) != 0) {
+  if (line.indexOf(tag) != -1 && line.indexOf(tag) != 0)
+  {
     pre.append(line.left(line.indexOf(tag)));
     post = line.right(line.length() - (line.indexOf(tag) + tag.length()));
   }
@@ -297,8 +332,10 @@ void ImportScraper::checkForTag(QList<QString> &pre, QString &post, QString &tag
 
 bool ImportScraper::checkType(QString baseName, QList<QFileInfo> &infos, QString &inputFile)
 {
-  for(const auto &i: infos) {
-    if(i.completeBaseName() == baseName) {
+  for (const auto &i : infos)
+  {
+    if (i.completeBaseName() == baseName)
+    {
       inputFile = i.absoluteFilePath();
       return true;
     }

@@ -40,7 +40,6 @@ public:
 
 private:
   int truncate(int value);
-
 };
 
 #endif // FXCONTRAST_H

@@ -28,32 +28,37 @@
 #include <QUrl>
 #include <QNetworkRequest>
 
-constexpr int MAXSIZE = 100*1024*1024;
+constexpr int MAXSIZE = 100 * 1024 * 1024;
 
 NetComm::NetComm(QSharedPointer<NetManager> manager)
-  : manager(manager)
+    : manager(manager)
 {
   requestTimer.setSingleShot(true);
   requestTimer.setInterval(30000);
   connect(&requestTimer, &QTimer::timeout, this, &NetComm::requestTimeout);
 }
 
-void NetComm::request(QString query, QString postData, QList<QPair<QString, QString> > headers)
+void NetComm::request(QString query, QString postData, QList<QPair<QString, QString>> headers)
 {
   QUrl url(query);
   QNetworkRequest request(url);
   request.setHeader(QNetworkRequest::UserAgentHeader, "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0");
   request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-  if(!headers.isEmpty()) {
-    for(const auto &header: headers) {
+  if (!headers.isEmpty())
+  {
+    for (const auto &header : headers)
+    {
       request.setRawHeader(header.first.toUtf8(), header.second.toUtf8());
     }
   }
 
-  if(postData.isNull()) {
+  if (postData.isNull())
+  {
     reply = manager->getRequest(request);
-  } else {
+  }
+  else
+  {
     reply = manager->postRequest(request, postData.toUtf8());
   }
   connect(reply, &QNetworkReply::finished, this, &NetComm::replyReady);
@@ -66,7 +71,8 @@ void NetComm::replyReady()
   requestTimer.stop();
   data = reply->readAll();
   error = reply->error();
-  contentType = reply->rawHeader("Content-Type");;
+  contentType = reply->rawHeader("Content-Type");
+  ;
   redirUrl = reply->rawHeader("Location");
   reply->deleteLater();
   emit dataReady();
@@ -79,8 +85,10 @@ QByteArray NetComm::getData()
 
 QNetworkReply::NetworkError NetComm::getError(const int &verbosity)
 {
-  if(error != QNetworkReply::NoError && verbosity >= 1) {
-    switch(error) {
+  if (error != QNetworkReply::NoError && verbosity >= 1)
+  {
+    switch (error)
+    {
     case QNetworkReply::RemoteHostClosedError:
       // 'screenscraper' will often give this error when it's overloaded.
       // But since we retry a couple of times, it's rarely a problem.
@@ -95,7 +103,7 @@ QNetworkReply::NetworkError NetComm::getError(const int &verbosity)
     case QNetworkReply::ContentNotFoundError:
       // Don't show an error on these. For some modules I am guessing for urls and
       // sometimes they simply don't exist. It's not an error in those cases.
-      //printf("\033[1;31mNetwork error: 'QNetworkReply::ContentNotFoundError'\033[0m\n");
+      // printf("\033[1;31mNetwork error: 'QNetworkReply::ContentNotFoundError'\033[0m\n");
       break;
     case QNetworkReply::ContentReSendError:
       printf("\033[1;31mNetwork error: 'QNetworkReply::ContentReSendError'\033[0m\n");
@@ -135,14 +143,15 @@ QByteArray NetComm::getRedirUrl()
 
 void NetComm::dataDownloaded(qint64 bytesReceived, qint64)
 {
-  if(bytesReceived > MAXSIZE) {
+  if (bytesReceived > MAXSIZE)
+  {
     printf("Retrieved data size exceeded maximum of 100 MB, cancelling network request...\n");
     reply->abort();
   }
 }
 
 void NetComm::requestTimeout()
-{ 
+{
   printf("\033[1;33mRequest timed out, server might be busy / overloaded...\033[0m\n");
   reply->abort();
 }

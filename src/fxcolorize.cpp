@@ -39,25 +39,29 @@ QImage FxColorize::applyEffect(const QImage &src, const Layer &layer)
   int hue = layer.value;
   int satDelta = layer.delta;
 
-  if(hue > 359 || hue < 0) {
+  if (hue > 359 || hue < 0)
+  {
     return canvas;
   }
 
-  if(satDelta > 127 || satDelta < -127) {
+  if (satDelta > 127 || satDelta < -127)
+  {
     satDelta = 0;
   }
   int saturation = 127 + satDelta;
 
-  for(int y = 0; y < canvas.height(); ++y) {
-    QRgb* line = (QRgb *)canvas.scanLine(y);
-    for(int x = 0; x < canvas.width(); ++x) {
-        QColor color(line[x]);
-	color.setHsl(hue, saturation,
-		     qRed(line[x]) * 0.2126 +
-		     qGreen(line[x]) * 0.7152 +
-		     qRed(line[x]) * 0.0722,
-		     qAlpha(line[x]));
-	line[x] = qPremultiply(color.rgba());
+  for (int y = 0; y < canvas.height(); ++y)
+  {
+    QRgb *line = (QRgb *)canvas.scanLine(y);
+    for (int x = 0; x < canvas.width(); ++x)
+    {
+      QColor color(line[x]);
+      color.setHsl(hue, saturation,
+                   qRed(line[x]) * 0.2126 +
+                       qGreen(line[x]) * 0.7152 +
+                       qRed(line[x]) * 0.0722,
+                   qAlpha(line[x]));
+      line[x] = qPremultiply(color.rgba());
     }
   }
 
